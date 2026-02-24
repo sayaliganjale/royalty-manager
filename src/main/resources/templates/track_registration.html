@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Register Production | AuditPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #020617; color: #cbd5e1; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .input-neo {
+            background: rgba(2, 6, 23, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .input-neo:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+            outline: none;
+        }
+        select option { background: #0f172a; color: white; }
+    </style>
+</head>
+<body class="min-h-screen p-8 custom-scrollbar">
+
+    <div class="container mx-auto max-w-6xl">
+        <div class="flex justify-between items-end mb-12">
+            <div>
+                <a th:href="@{/dashboard}" class="text-slate-500 hover:text-indigo-400 text-xs font-bold uppercase tracking-[0.2em] mb-4 inline-block transition-colors">
+                    <i class="fas fa-chevron-left mr-2"></i> Exit Studio
+                </a>
+                <h1 class="text-4xl font-black text-white tracking-tighter italic">Track <span class="text-indigo-500 text-5xl">Registration</span></h1>
+            </div>
+            <div class="text-right hidden md:block">
+                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Status</p>
+                <p class="text-sm font-bold text-emerald-500">Ready for Uplink</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+            <div class="lg:col-span-3 glass-panel p-10 rounded-[2.5rem] shadow-2xl shadow-black/50">
+                <form th:action="@{/label/save-track}" th:object="${track}" method="post" class="space-y-8">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assign Artist Entity</label>
+                            <div class="relative">
+                                <i class="fas fa-user-tie absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
+                                <select th:field="*{artist}" class="input-neo w-full py-4 pl-12 pr-4 rounded-2xl text-white appearance-none cursor-pointer" required>
+                                    <option value="" disabled selected>Select Master Artist</option>
+                                    <option th:each="a : ${artists}" th:value="${a.id}" th:text="${a.name}"></option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Production Title</label>
+                            <div class="relative">
+                                <i class="fas fa-music absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
+                                <input type="text" th:field="*{title}" class="input-neo w-full py-4 pl-12 pr-4 rounded-2xl text-white placeholder-slate-700" placeholder="e.g. Midnight City" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">ISRC Identification</label>
+                            <input type="text" class="input-neo w-full py-4 px-6 rounded-2xl text-white placeholder-slate-700 uppercase" placeholder="US-RC1-23-45678">
+                        </div>
+
+                        <div class="space-y-3">
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Launch Date</label>
+                            <input type="date" class="input-neo w-full py-4 px-6 rounded-2xl text-white placeholder-slate-700">
+                        </div>
+                    </div>
+
+                    <div class="p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10 flex items-center justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-white">Advanced Distribution Meta</h4>
+                            <p class="text-[10px] text-slate-500 uppercase">Enable Dolby Atmos & 3D Spatial Audio</p>
+                        </div>
+                        <div class="w-12 h-6 bg-slate-800 rounded-full relative p-1 cursor-pointer">
+                            <div class="w-4 h-4 bg-indigo-500 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl hover:bg-white hover:text-black transition-all duration-500 shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-4 group">
+                        PROCEED WITH ENROLLMENT 
+                        <i class="fas fa-arrow-right text-xs transform group-hover:translate-x-2 transition-transform"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="lg:col-span-2 space-y-8">
+                <div class="glass-panel p-8 rounded-[2.5rem] h-full">
+                    <h3 class="text-xl font-black text-white mb-6 italic tracking-tight">Market Projection</h3>
+                    <div class="h-64 mb-8">
+                        <canvas id="marketChart"></canvas>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Estimated Monthly Streams</p>
+                            <p class="text-2xl font-black text-indigo-400">1.2M - 4.8M</p>
+                        </div>
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
+                            <p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Platform Compatibility</p>
+                            <div class="flex gap-4 mt-2 text-xl text-slate-400">
+                                <i class="fab fa-spotify hover:text-[#1DB954] transition-colors"></i>
+                                <i class="fab fa-apple hover:text-white transition-colors"></i>
+                                <i class="fab fa-youtube hover:text-[#FF0000] transition-colors"></i>
+                                <i class="fab fa-amazon hover:text-[#FF9900] transition-colors"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('marketChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                    datasets: [{
+                        label: 'Projected Reach',
+                        data: [10, 35, 25, 65, 90],
+                        borderColor: '#6366f1',
+                        borderWidth: 4,
+                        pointBackgroundColor: '#6366f1',
+                        tension: 0.4,
+                        fill: true,
+                        backgroundColor: (context) => {
+                            const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
+                            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+                            gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+                            return gradient;
+                        },
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+                        y: { display: false }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

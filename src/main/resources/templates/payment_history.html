@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Financial Ledger | AuditPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #020617; color: #e2e8f0; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    </style>
+</head>
+<body class="p-10">
+    <div class="max-w-5xl mx-auto glass p-12 rounded-[3.5rem] shadow-2xl">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
+            <div>
+                <h2 class="text-3xl font-black italic tracking-tighter uppercase">7️⃣ Payment <span class="text-emerald-400">History</span></h2>
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mt-1">Transaction Ledger & Monthly Statements</p>
+            </div>
+            <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-500 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
+                <i class="fas fa-file-pdf mr-2"></i> Download Full Report (PDF)
+            </button>
+        </div>
+
+        <div class="overflow-hidden rounded-[2rem] border border-white/5">
+            <table class="w-full text-left">
+                <thead class="bg-white/5 text-[10px] font-black uppercase text-slate-500">
+                    <tr>
+                        <th class="p-8">Billing Cycle</th>
+                        <th class="p-8">Gross Revenue</th>
+                        <th class="p-8">Net Payout (70%)</th>
+                        <th class="p-8 text-right">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                    <tr class="hover:bg-white/[0.02] transition">
+                        <td class="p-8 font-bold">JANUARY 2026</td>
+                        <td class="p-8 text-slate-400 font-mono">$10,000.00</td>
+                        <td class="p-8 font-black text-emerald-400">$7,000.00</td>
+                        <td class="p-8 text-right">
+                            <span class="bg-emerald-500/10 text-emerald-400 px-4 py-1 rounded-full text-[9px] font-black border border-emerald-500/20 uppercase">Disbursed</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <p class="mt-8 text-center">
+            <a th:href="@{/artist/dashboard}" class="text-[10px] font-black text-slate-600 hover:text-indigo-400 uppercase tracking-widest transition">← Return to Control Center</a>
+        </p>
+    </div>
+</body>
+</html>

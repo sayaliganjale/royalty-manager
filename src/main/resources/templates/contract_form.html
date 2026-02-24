@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Contract Studio | AuditPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #020617; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .input-neo {
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-neo:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+        select option { background: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="w-full max-w-2xl">
+        <a th:href="@{/dashboard}" class="text-slate-500 hover:text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-6 inline-block">
+            <i class="fas fa-chevron-left mr-2"></i> Back to HQ
+        </a>
+
+        <div class="glass-panel p-10 rounded-[2.5rem] shadow-2xl shadow-indigo-500/5">
+            <div class="mb-10 flex items-center gap-5">
+                <div class="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <i class="fas fa-file-signature text-white text-xl"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-black text-white italic tracking-tighter">Contract <span class="text-indigo-500 text-4xl">Agreement</span></h2>
+                    <p class="text-slate-500 text-xs mt-1 uppercase tracking-widest font-bold">Rule Engine Configuration</p>
+                </div>
+            </div>
+
+            <form th:action="@{/label/save-contract}" th:object="${contract}" method="post" class="space-y-8">
+                
+                <div class="space-y-3">
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Entity Selection</label>
+                    <select th:field="*{artist}" class="input-neo w-full py-4 px-6 rounded-2xl text-white cursor-pointer" required>
+                        <option value="" disabled selected>-- Choose Artist --</option>
+                        <option th:each="a : ${artists}" th:value="${a.id}" th:text="${a.name}"></option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-emerald-500 uppercase tracking-widest ml-1">Artist Revenue %</label>
+                        <input type="number" step="0.01" th:field="*{artistShare}" class="input-neo w-full py-4 px-6 rounded-2xl text-white font-mono" placeholder="70.00">
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Label Retention %</label>
+                        <input type="number" step="0.01" th:field="*{labelShare}" class="input-neo w-full py-4 px-6 rounded-2xl text-white font-mono" placeholder="30.00">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Commencement Date</label>
+                        <input type="date" th:field="*{startDate}" class="input-neo w-full py-4 px-6 rounded-2xl text-white">
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Termination Date</label>
+                        <input type="date" th:field="*{endDate}" class="input-neo w-full py-4 px-6 rounded-2xl text-white">
+                    </div>
+                </div>
+
+                <div class="p-5 bg-amber-500/5 border border-amber-500/20 rounded-2xl">
+                    <p class="text-[10px] text-amber-500 font-black flex items-center gap-2 uppercase tracking-tighter italic">
+                        <i class="fas fa-triangle-exclamation"></i> Warning: This will override existing global split rules.
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <button type="submit" class="w-full bg-white text-black font-black py-5 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all duration-300 shadow-xl flex items-center justify-center gap-3">
+                        FINALIZE LEGAL AGREEMENT
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

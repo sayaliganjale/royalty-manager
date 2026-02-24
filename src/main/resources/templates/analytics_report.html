@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Financial Audit | AuditPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #020617; color: #f1f5f9; }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .gradient-border {
+            position: relative;
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            padding: 1px;
+        }
+        .gradient-content {
+            background: #0f172a;
+            border-radius: 1.5rem;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen p-6 md:p-12 custom-scrollbar">
+
+    <div class="max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
+            <div>
+                <a th:href="@{/dashboard}" class="text-indigo-400 text-xs font-black uppercase tracking-[0.2em] mb-3 inline-block">
+                    <i class="fas fa-arrow-left mr-2"></i> Terminal Home
+                </a>
+                <h1 class="text-4xl font-black text-white italic tracking-tighter">Financial <span class="text-indigo-500 text-5xl">Analytics</span></h1>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="window.print()" class="px-6 py-3 bg-white/5 border border-white/10 rounded-2xl text-xs font-bold hover:bg-white/10 transition-all">
+                    <i class="fas fa-print mr-2"></i> Print Audit
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="glass-card p-8 rounded-[2.5rem] border-l-4 border-indigo-500">
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Gross Revenue</p>
+                <h2 class="text-4xl font-black text-white" th:text="${'$' + #numbers.formatDecimal(totalRevenue, 1, 2)}">$0.00</h2>
+                <p class="text-[10px] text-slate-500 mt-4 uppercase font-bold tracking-widest">Total Earnings Collected</p>
+            </div>
+
+            <div class="glass-card p-8 rounded-[2.5rem] border-l-4 border-emerald-500">
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Artist Share (70%)</p>
+                <h2 class="text-4xl font-black text-emerald-400" th:text="${'$' + #numbers.formatDecimal(artistTotal, 1, 2)}">$0.00</h2>
+                <p class="text-[10px] text-slate-500 mt-4 uppercase font-bold tracking-widest">Net Payable to Artists</p>
+            </div>
+
+            <div class="glass-card p-8 rounded-[2.5rem] border-l-4 border-purple-500">
+                <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-4">Label Profit (30%)</p>
+                <h2 class="text-4xl font-black text-indigo-400" th:text="${'$' + #numbers.formatDecimal(labelTotal, 1, 2)}">$0.00</h2>
+                <p class="text-[10px] text-slate-500 mt-4 uppercase font-bold tracking-widest">Retained Label Earnings</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div class="glass-card p-8 rounded-[2.5rem]">
+                <h3 class="text-lg font-bold mb-8 text-slate-300 italic">Revenue Distribution Split</h3>
+                <div class="h-80">
+                    <canvas id="splitChart"></canvas>
+                </div>
+            </div>
+
+            <div class="gradient-border">
+                <div class="gradient-content p-8 h-full flex flex-col justify-center">
+                    <h3 class="text-xl font-black mb-4 text-white uppercase tracking-widest">Auditor's Insights</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-8">
+                        The 70/30 split logic is successfully applied across all registered tracks. This dashboard provides a consolidated view of the gross revenue vs the operational retention. All platform data is synchronized for current month.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-5 bg-white/5 rounded-2xl border border-white/5">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Data Integrity</span>
+                            <span class="text-xs font-black text-emerald-500 tracking-widest"><i class="fas fa-shield-check mr-1"></i> VERIFIED</span>
+                        </div>
+                        <div class="flex justify-between items-center p-5 bg-white/5 rounded-2xl border border-white/5">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Audit Version</span>
+                            <span class="text-xs font-black text-indigo-400 tracking-widest">V2.0 ALPHA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl">
+            <div class="p-8 border-b border-white/5 bg-slate-900/40">
+                <h3 class="text-xl font-black text-white italic tracking-tight uppercase">Recent Financial Transaction Ledger</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-slate-500 text-[10px] uppercase font-black tracking-[0.2em] border-b border-white/5">
+                            <th class="px-8 py-6">Source Platform</th>
+                            <th class="px-8 py-6 text-right">Gross Amount</th>
+                            <th class="px-8 py-6 text-right text-emerald-500">Artist Payout (70%)</th>
+                            <th class="px-8 py-6 text-right text-indigo-400">Label Profit (30%)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr th:each="tx : ${transactions}" class="hover:bg-white/[0.03] transition-all">
+                            <td class="px-8 py-6">
+                                <span class="px-4 py-1 bg-slate-800 text-indigo-400 text-[10px] font-black rounded-lg border border-indigo-500/20 uppercase" th:text="${tx.platform}"></span>
+                            </td>
+                            <td class="px-8 py-6 text-right font-bold text-slate-300" th:text="${'$' + #numbers.formatDecimal(tx.grossRevenue, 1, 2)}"></td>
+                            <td class="px-8 py-6 text-right font-black text-emerald-400" th:text="${'$' + #numbers.formatDecimal(tx.grossRevenue * 0.70, 1, 2)}"></td>
+                            <td class="px-8 py-6 text-right font-black text-indigo-500" th:text="${'$' + #numbers.formatDecimal(tx.grossRevenue * 0.30, 1, 2)}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div th:if="${#lists.isEmpty(transactions)}" class="p-20 text-center text-slate-600">
+                <i class="fas fa-file-invoice-dollar text-5xl mb-4 opacity-20"></i>
+                <p class="italic">No transaction data available for this cycle.</p>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Thymeleaf Safe Injection (Fixes the comma error)
+            const artistVal = /*[[${artistTotal}]]*/ 0;
+            const labelVal = /*[[${labelTotal}]]*/ 0;
+
+            const ctx = document.getElementById('splitChart').getContext('2d');
+            if (ctx) {
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Artist Share (70%)', 'Label Profit (30%)'],
+                        datasets: [{
+                            data: [artistVal, labelVal],
+                            backgroundColor: ['#10b981', '#6366f1'],
+                            borderRadius: 15,
+                            barThickness: 50,
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                titleFont: { size: 14, weight: 'bold' },
+                                padding: 15,
+                                cornerRadius: 10,
+                                callbacks: {
+                                    label: function(context) { return ' $' + context.raw.toFixed(2); }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false },
+                                ticks: { 
+                                    color: '#64748b', 
+                                    font: { size: 10 },
+                                    callback: function(value) { return '$' + value; }
+                                }
+                            },
+                            x: { 
+                                grid: { display: false }, 
+                                ticks: { color: '#f8fafc', font: { weight: 'bold', size: 11 } } 
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

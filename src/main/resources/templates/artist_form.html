@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Onboard New Artist | AuditPro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #020617; }
+        .form-glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .input-field {
+            background: rgba(2, 6, 23, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+            outline: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px]"></div>
+    </div>
+
+    <div class="w-full max-w-xl">
+        <a th:href="@{/dashboard}" class="inline-flex items-center text-slate-500 hover:text-indigo-400 mb-8 transition-colors group">
+            <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i> 
+            <span class="text-xs font-bold uppercase tracking-widest">Return to Command Center</span>
+        </a>
+
+        <div class="form-glass p-10 rounded-[2.5rem]">
+            <div class="mb-10 text-center">
+                <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/20">
+                    <i class="fas fa-user-plus text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-black text-white tracking-tight">Artist Onboarding</h2>
+                <p class="text-slate-500 text-sm mt-2">Create a new artist profile in the ecosystem.</p>
+            </div>
+
+            <form th:action="@{/save-artist}" th:object="${artist}" method="post" class="space-y-6">
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1">Legal Name / Stage Name</label>
+                    <div class="relative">
+                        <i class="fas fa-signature absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
+                        <input type="text" th:field="*{name}" class="input-field w-full py-4 pl-12 pr-4 rounded-2xl text-white placeholder-slate-700" placeholder="e.g. Noah Rhodes" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1">Official Email Address</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
+                        <input type="email" th:field="*{email}" class="input-field w-full py-4 pl-12 pr-4 rounded-2xl text-white placeholder-slate-700" placeholder="artist@example.com" required>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1">Artist Biography (Optional)</label>
+                    <textarea class="input-field w-full p-4 rounded-2xl text-white placeholder-slate-700 h-32 resize-none" placeholder="Brief background of the artist..."></textarea>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-white text-black font-black py-5 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all duration-300 shadow-xl shadow-white/5 flex items-center justify-center gap-3 group">
+                        Confirm Registration 
+                        <i class="fas fa-chevron-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <p class="text-center text-slate-600 text-[10px] mt-8 uppercase font-bold tracking-widest">
+            AuditPro Security Protocols Active &bull; Version 2.0
+        </p>
+    </div>
+
+</body>
+</html>
