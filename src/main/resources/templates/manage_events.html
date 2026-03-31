@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage Events | Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pastel-lavender: #e8e0f5;
+            --pastel-rose:     #fce8ee;
+            --pastel-mint:     #ddf5ee;
+            --pastel-sky:      #dceefb;
+            --pastel-peach:    #fdecd8;
+            --accent-purple:   #9b7fd4;
+            --accent-pink:     #e07ca0;
+            --accent-teal:     #4daa90;
+            --accent-blue:     #5ba3d9;
+            --accent-peach:    #e8965a;
+            --text-dark:       #2d2746;
+            --text-mid:        #6b6489;
+            --text-light:      #a09bbf;
+            --sidebar-bg:      rgba(255,255,255,0.75);
+            --card-bg:         rgba(255,255,255,0.85);
+            --card-border:     rgba(180,160,220,0.22);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: linear-gradient(135deg, #f0ebff 0%, #fce8ee 35%, #dceefb 65%, #ddf5ee 100%);
+            font-family: 'Inter', sans-serif; color: var(--text-dark);
+            min-height: 100vh; display: flex; overflow-x: hidden;
+        }
+        h1,h2,h3,h4,h5 { font-family: 'Nunito', sans-serif; }
+        .blob { position: fixed; border-radius: 50%; filter: blur(90px); opacity: 0.35; z-index: 0; pointer-events: none; animation: drift 20s ease-in-out infinite alternate; }
+        .blob-1 { width: 500px; height: 500px; background: var(--pastel-lavender); top: -10%; left: 10%; }
+        .blob-2 { width: 400px; height: 400px; background: var(--pastel-rose);     top: 50%; right: -5%; animation-delay: -8s; }
+        .blob-3 { width: 350px; height: 350px; background: var(--pastel-mint);     bottom: -5%; left: 30%; animation-delay: -14s; }
+        @keyframes drift { 0%{transform:translate(0,0) scale(1)} 100%{transform:translate(35px,25px) scale(1.07)} }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px; flex-shrink: 0;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+            border-right: 1px solid var(--card-border);
+            padding: 36px 20px;
+            display: flex; flex-direction: column;
+            position: sticky; top: 0; height: 100vh;
+            z-index: 50; box-shadow: 4px 0 24px rgba(155,127,212,0.07);
+        }
+
+        .sidebar-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; padding: 0 8px; }
+        .logo-icon {
+            width: 44px; height: 44px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.1rem;
+            box-shadow: 0 6px 18px rgba(155,127,212,0.35);
+        }
+        .logo-text h1 { font-size: 1.1rem; font-weight: 900; color: var(--text-dark); }
+        .logo-text p  { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); }
+
+        .nav-section-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-light); padding: 0 8px; margin-bottom: 10px; margin-top: 24px; }
+
+        .sidebar-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 11px 14px; border-radius: 12px;
+            color: var(--text-mid); font-weight: 600; font-size: 0.85rem;
+            text-decoration: none; transition: all 0.2s ease; margin-bottom: 4px;
+        }
+        .sidebar-link i { width: 18px; text-align: center; font-size: 0.9rem; }
+        .sidebar-link:hover { color: var(--text-dark); background: rgba(155,127,212,0.08); transform: translateX(3px); }
+        .sidebar-link.active {
+            color: var(--accent-purple); background: var(--pastel-lavender);
+            border-left: 3px solid var(--accent-purple); border-radius: 0 12px 12px 0; font-weight: 700;
+        }
+
+        /* MAIN */
+        .main { flex: 1; padding: 40px 44px; overflow-y: auto; max-height: 100vh; position: relative; z-index: 1; }
+        .main::-webkit-scrollbar { width: 5px; }
+        .main::-webkit-scrollbar-thumb { background: var(--pastel-lavender); border-radius: 10px; }
+
+        /* PAGE HEADER */
+        .page-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .page-title   { font-size: 2.4rem; font-weight: 900; color: var(--text-dark); letter-spacing: -1px; }
+        .page-title span { background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .page-subtitle { font-size: 0.82rem; color: var(--text-mid); font-weight: 500; margin-top: 4px; }
+
+        .status-chip {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--pastel-mint); border: 1px solid rgba(77,170,144,0.3);
+            padding: 10px 18px; border-radius: 30px;
+            font-size: 0.72rem; font-weight: 700; color: var(--accent-teal);
+        }
+        .status-chip .dot { width: 7px; height: 7px; background: var(--accent-teal); border-radius: 50%; animation: blink 1.4s infinite; }
+
+        /* CARD PANEL */
+        .panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border); border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(155,127,212,0.09), 0 2px 8px rgba(0,0,0,0.03);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        .panel:hover { transform: translateY(-3px); box-shadow: 0 16px 48px rgba(155,127,212,0.15), 0 4px 12px rgba(0,0,0,0.04); }
+
+        .panel-header {
+            padding: 22px 28px; border-bottom: 1px solid rgba(180,160,220,0.15);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .panel-title { font-size: 0.92rem; font-weight: 800; color: var(--text-dark); display: flex; align-items: center; gap: 9px; }
+        .panel-badge {
+            font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+            padding: 4px 10px; border-radius: 20px;
+        }
+        .badge-purple { background: var(--pastel-lavender); color: var(--accent-purple); }
+        .badge-mint   { background: var(--pastel-mint);     color: var(--accent-teal); }
+        .badge-rose   { background: var(--pastel-rose);     color: var(--accent-pink); }
+
+        /* FORM */
+        .create-form { padding: 28px; }
+        .form-label { display: block; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 7px; }
+        .form-input {
+            width: 100%; padding: 12px 15px;
+            background: rgba(248,246,255,0.9); border: 1.5px solid rgba(180,160,220,0.28);
+            border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 0.85rem;
+            font-weight: 600; color: var(--text-dark); transition: all 0.2s; outline: none;
+        }
+        .form-input:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 4px rgba(155,127,212,0.1); background: white; }
+        .form-input::placeholder { color: var(--text-light); font-weight: 400; }
+        .form-group { margin-bottom: 16px; }
+        .btn-create {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            color: white; font-family: 'Nunito', sans-serif; font-size: 0.88rem; font-weight: 900;
+            border: none; border-radius: 14px; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(155,127,212,0.3);
+            transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            letter-spacing: 0.02em; margin-top: 8px;
+        }
+        .btn-create:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(155,127,212,0.42); }
+
+        /* TABLE */
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: rgba(248,246,255,0.7); }
+        th { padding: 14px 20px; font-size: 0.63rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); text-align: left; border-bottom: 1px solid rgba(180,160,220,0.15); }
+        td { padding: 16px 20px; border-bottom: 1px solid rgba(180,160,220,0.1); font-size: 0.85rem; vertical-align: middle; }
+        tbody tr { transition: background 0.15s; }
+        tbody tr:hover { background: rgba(248,246,255,0.7); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        .event-name-cell { font-weight: 700; color: var(--text-dark); font-size: 0.88rem; }
+        .event-sub { font-size: 0.68rem; color: var(--text-light); font-weight: 500; margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+        .artist-chip { display: inline-block; background: var(--pastel-lavender); color: var(--accent-purple); font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .price-cell { font-family: 'Nunito', sans-serif; font-size: 1.05rem; font-weight: 900; color: var(--text-dark); }
+        .empty-row td { text-align: center; padding: 48px; color: var(--text-light); font-size: 0.8rem; font-weight: 600; }
+
+        /* ARTIST EARNINGS */
+        .earnings-list { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .earnings-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 18px; border-radius: 14px;
+            background: rgba(248,246,255,0.8); border: 1px solid rgba(180,160,220,0.2);
+            transition: all 0.2s;
+        }
+        .earnings-item:hover { background: white; border-color: rgba(155,127,212,0.3); box-shadow: 0 4px 16px rgba(155,127,212,0.1); }
+        .earnings-artist  { font-weight: 700; font-size: 0.85rem; color: var(--text-dark); }
+        .earnings-split   { font-size: 0.66rem; color: var(--accent-teal); font-weight: 700; margin-top: 3px; }
+        .earnings-amount  { font-family: 'Nunito', sans-serif; font-size: 1.15rem; font-weight: 900; color: var(--accent-purple); }
+
+        /* GRID */
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 28px; }
+        @media(min-width: 1200px) { .content-grid { grid-template-columns: 350px 1fr; } }
+        .right-col { display: flex; flex-direction: column; gap: 28px; }
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+        @media(max-width: 700px) { .bottom-grid { grid-template-columns: 1fr; } }
+
+        .scroll-area { max-height: 360px; overflow-y: auto; }
+        .scroll-area::-webkit-scrollbar { width: 4px; }
+        .scroll-area::-webkit-scrollbar-thumb { background: var(--pastel-lavender); border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
+            <div class="logo-text">
+                <h1>SysAdmin</h1>
+                <p>Executive Console</p>
+            </div>
+        </div>
+
+        <div class="nav-section-label">Management</div>
+        <a th:href="@{/dashboard}"             class="sidebar-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a th:href="@{/add-artist}"            class="sidebar-link"><i class="fas fa-users-gear"></i> Artists &amp; Payouts</a>
+        <a th:href="@{/label/track-registration}" class="sidebar-link"><i class="fas fa-compact-disc"></i> Track Registry</a>
+        <a th:href="@{/admin/events}"          class="sidebar-link active"><i class="fas fa-calendar-star"></i> Live Events</a>
+        <a th:href="@{/label/analytics}"       class="sidebar-link"><i class="fas fa-chart-line"></i> Analytics</a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+        <div class="page-header">
+            <div>
+                <h2 class="page-title">Live <span>Events</span></h2>
+                <p class="page-subtitle">Create, manage and monitor all ticketed events</p>
+            </div>
+            <div class="status-chip">
+                <span class="dot"></span>
+                Ticketing Active
+            </div>
+        </div>
+
+        <div class="content-grid">
+
+            <!-- CREATE FORM PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-plus-circle" style="color:var(--accent-purple)"></i>
+                        Create New Event
+                    </div>
+                    <span class="panel-badge badge-purple">New</span>
+                </div>
+                <div class="create-form">
+                    <form th:action="@{/admin/events/save}" method="post">
+                        <div class="form-group">
+                            <label class="form-label">Event Name</label>
+                            <input type="text" name="name" class="form-input" placeholder="e.g. Summer Showcase 2026" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Event Date</label>
+                            <input type="date" name="eventDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Venue</label>
+                            <input type="text" name="venue" class="form-input" placeholder="e.g. Madison Square Garden" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Base Ticket Price ($)</label>
+                            <input type="number" step="0.01" name="ticketPrice" class="form-input" placeholder="0.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Artist</label>
+                            <select name="artistId" class="form-input" required>
+                                <option value="" disabled selected>Select an artist...</option>
+                                <option th:each="artist : ${artists}" th:value="${artist.id}" th:text="${artist.name}"></option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-create">
+                            <i class="fas fa-rocket"></i> Schedule Event
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN -->
+            <div class="right-col">
+
+                <!-- UPCOMING EVENTS TABLE -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            <i class="fas fa-calendar-check" style="color:var(--accent-teal)"></i>
+                            Upcoming Events
+                        </div>
+                        <span class="panel-badge badge-mint">Live</span>
+                    </div>
+                    <div class="scroll-area">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Artist</th>
+                                    <th style="text-align:right">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="event : ${upcomingEvents}">
+                                    <td>
+                                        <div class="event-name-cell" th:text="${event.name}">Event Name</div>
+                                        <div class="event-sub">
+                                            <i class="fas fa-calendar-alt" style="color:var(--accent-teal); font-size:0.6rem"></i>
+                                            <span th:text="${event.eventDate}"></span> &bull;
+                                            <span th:text="${event.venue}"></span>
+                                        </div>
+                                    </td>
+                                    <td><span class="artist-chip" th:text="${event.artist.name}">Artist</span></td>
+                                    <td style="text-align:right">
+                                        <span class="price-cell" th:text="${'$' + #numbers.formatDecimal(event.ticketPrice, 1, 2)}">$0.00</span>
+                                    </td>
+                                </tr>
+                                <tr th:if="${upcomingEvents.empty}" class="empty-row">
+                                    <td colspan="3"><i class="fas fa-calendar-xmark" style="margin-right:8px; color:var(--text-light)"></i>No upcoming events scheduled.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- BOTTOM GRID -->
+                <div class="bottom-grid">
+
+                    <!-- PAST EVENTS -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <i class="fas fa-clock-rotate-left" style="color:var(--accent-blue)"></i>
+                                Past Events
+                            </div>
+                            <span class="panel-badge" style="background:var(--pastel-sky);color:var(--accent-blue)">Archive</span>
+                        </div>
+                        <div class="scroll-area">
+                            <table>
+                                <tbody>
+                                    <tr th:each="event : ${pastEvents}">
+                                        <td>
+                                            <div style="font-weight:700; color:var(--text-mid); font-size:0.83rem" th:text="${event.name}">Event</div>
+                                            <div class="event-sub">
+                                                <span th:text="${event.artist.name}"></span> &bull; <span th:text="${event.eventDate}"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${pastEvents.empty}" class="empty-row">
+                                        <td>No past events.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ARTIST TICKET EARNINGS -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <i class="fas fa-coins" style="color:var(--accent-peach)"></i>
+                                Ticket Earnings
+                            </div>
+                            <span class="panel-badge badge-rose">Splits</span>
+                        </div>
+                        <div class="scroll-area">
+                            <div class="earnings-list">
+                                <div th:each="artist : ${artists}" class="earnings-item">
+                                    <div>
+                                        <div class="earnings-artist" th:text="${artist.name}">Artist</div>
+                                        <div class="earnings-split" th:text="'Royalty: ' + ${artist.contractSplit} + '%'">Split</div>
+                                    </div>
+                                    <div class="earnings-amount"
+                                         th:text="${'$' + #numbers.formatDecimal(royaltyService.getEventRevenueForArtist(artist.id) * (artist.contractSplit / 100.0), 1, 2)}">$0.00</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- end bottom-grid -->
+            </div><!-- end right-col -->
+        </div><!-- end content-grid -->
+    </main>
+</body>
+</html>

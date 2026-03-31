@@ -1,126 +1,197 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Register Production | AuditPro</title>
+    <title>Track Registry | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #020617; color: #cbd5e1; }
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .input-neo {
-            background: rgba(2, 6, 23, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .input-neo:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
-            outline: none;
-        }
-        select option { background: #0f172a; color: white; }
+        :root{--pl:#e8e0f5;--pr:#fce8ee;--pm:#ddf5ee;--ps:#dceefb;--pp:#fdecd8;--ap:#9b7fd4;--ak:#e07ca0;--at:#4daa90;--ab:#5ba3d9;--td:#2d2746;--tm:#6b6489;--tl:#a09bbf;--cb:rgba(180,160,220,0.22);}
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{background:linear-gradient(135deg,#f0ebff 0%,#fce8ee 40%,#dceefb 75%,#ddf5ee 100%);font-family:'Inter',sans-serif;color:var(--td);min-height:100vh;display:flex;overflow-x:hidden;}
+        h1,h2,h3,h4,h5{font-family:'Nunito',sans-serif;}
+        .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.35;z-index:0;pointer-events:none;animation:drift 20s ease-in-out infinite alternate;}
+        .b1{width:460px;height:460px;background:var(--pl);top:-10%;left:10%;}
+        .b2{width:360px;height:360px;background:var(--pr);top:50%;right:-5%;animation-delay:-8s;}
+        .b3{width:300px;height:300px;background:var(--pm);bottom:-5%;left:30%;animation-delay:-14s;}
+        @keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(32px,24px) scale(1.07)}}
+
+        .sidebar{width:250px;flex-shrink:0;background:rgba(255,255,255,0.75);backdrop-filter:blur(24px);border-right:1px solid var(--cb);padding:32px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:50;box-shadow:4px 0 24px rgba(155,127,212,0.07);}
+        .logo-row{display:flex;align-items:center;gap:12px;margin-bottom:36px;padding:0 6px;}
+        .logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--ap),var(--ak));display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;box-shadow:0 6px 16px rgba(155,127,212,0.35);}
+        .logo-text h1{font-size:1rem;font-weight:900;color:var(--td);}
+        .logo-text p{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--tl);}
+        .nav-label{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--tl);padding:0 8px;margin-bottom:8px;margin-top:20px;}
+        .nav-link{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;color:var(--tm);font-weight:600;font-size:0.82rem;text-decoration:none;transition:all 0.2s;margin-bottom:3px;}
+        .nav-link i{width:16px;text-align:center;font-size:0.85rem;}
+        .nav-link:hover{color:var(--td);background:rgba(155,127,212,0.08);transform:translateX(3px);}
+        .nav-link.active{color:var(--ap);background:var(--pl);border-left:3px solid var(--ap);border-radius:0 11px 11px 0;font-weight:700;}
+
+        .main{flex:1;padding:40px 44px;overflow-y:auto;max-height:100vh;position:relative;z-index:1;}
+        .main::-webkit-scrollbar{width:5px;}
+        .main::-webkit-scrollbar-thumb{background:var(--pl);border-radius:10px;}
+
+        .page-header{margin-bottom:36px;}
+        .page-title{font-size:2.2rem;font-weight:900;color:var(--td);letter-spacing:-0.8px;}
+        .page-title span{background:linear-gradient(135deg,var(--ap),var(--ab));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+        .page-sub{font-size:0.82rem;color:var(--tm);margin-top:4px;}
+
+        .content-grid{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;}
+        @media(max-width:1100px){.content-grid{grid-template-columns:1fr;}}
+
+        .panel{background:rgba(255,255,255,0.88);border:1px solid var(--cb);border-radius:24px;box-shadow:0 8px 32px rgba(155,127,212,0.09);overflow:hidden;transition:transform 0.3s,box-shadow 0.3s;}
+        .panel:hover{transform:translateY(-3px);box-shadow:0 14px 48px rgba(155,127,212,0.15);}
+        .panel-header{padding:20px 28px;border-bottom:1px solid rgba(180,160,220,0.15);display:flex;align-items:center;gap:10px;background:rgba(248,246,255,0.4);}
+        .panel-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
+        .panel-title{font-size:0.92rem;font-weight:800;color:var(--td);}
+        .panel-body{padding:28px;}
+
+        .form-group{margin-bottom:16px;}
+        .form-label{display:block;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--tl);margin-bottom:7px;}
+        .input-wrap{position:relative;}
+        .input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--tl);font-size:0.82rem;}
+        .form-input{width:100%;padding:12px 14px 12px 38px;background:rgba(248,246,255,0.9);border:1.5px solid rgba(180,160,220,0.28);border-radius:12px;font-family:'Inter',sans-serif;font-size:0.86rem;font-weight:600;color:var(--td);outline:none;transition:all 0.2s;}
+        .form-input:focus{border-color:var(--ap);box-shadow:0 0 0 4px rgba(155,127,212,0.1);background:white;}
+        .form-input::placeholder{color:var(--tl);font-weight:400;}
+        .form-input.no-icon{padding-left:14px;}
+        select.form-input{cursor:pointer;}
+        select option{color:var(--td);background:white;}
+        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+
+        .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(248,246,255,0.7);border:1px solid rgba(180,160,220,0.2);border-radius:14px;margin-bottom:16px;}
+        .toggle-label h4{font-weight:700;font-size:0.85rem;color:var(--td);}
+        .toggle-label p{font-size:0.68rem;color:var(--tl);margin-top:2px;}
+        .toggle{width:46px;height:24px;background:rgba(155,127,212,0.2);border-radius:30px;padding:3px;cursor:pointer;position:relative;transition:background 0.3s;border:none;}
+        .toggle-thumb{width:18px;height:18px;background:var(--ap);border-radius:50%;box-shadow:0 2px 6px rgba(155,127,212,0.4);transition:transform 0.3s;}
+
+        .btn-register{width:100%;padding:14px;background:linear-gradient(135deg,var(--ap),var(--ak));color:white;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:900;border:none;border-radius:14px;cursor:pointer;box-shadow:0 6px 20px rgba(155,127,212,0.3);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
+        .btn-register:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(155,127,212,0.44);}
+
+        .chart-panel-body{padding:24px;}
+        .stat-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(248,246,255,0.7);border:1px solid rgba(180,160,220,0.18);border-radius:12px;margin-bottom:10px;transition:all 0.2s;}
+        .stat-row:hover{background:white;box-shadow:0 4px 14px rgba(155,127,212,0.1);}
+        .stat-row-label{font-size:0.75rem;color:var(--tm);font-weight:600;}
+        .stat-row-value{font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;color:var(--ap);}
+
+        .platform-icons{display:flex;gap:16px;padding:14px 0;}
+        .platform-icons i{font-size:1.4rem;color:var(--tl);transition:all 0.2s;cursor:pointer;}
+        .platform-icons i:hover{transform:scale(1.15);}
+        .platform-icons .fa-spotify:hover{color:#1db954;}
+        .platform-icons .fa-apple:hover{color:#555;}
+        .platform-icons .fa-youtube:hover{color:#e74c3c;}
+        .platform-icons .fa-amazon:hover{color:#f59e0b;}
+        .platform-icons .fa-soundcloud:hover{color:#ff5500;}
     </style>
 </head>
-<body class="min-h-screen p-8 custom-scrollbar">
+<body>
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
 
-    <div class="container mx-auto max-w-6xl">
-        <div class="flex justify-between items-end mb-12">
-            <div>
-                <a th:href="@{/dashboard}" class="text-slate-500 hover:text-indigo-400 text-xs font-bold uppercase tracking-[0.2em] mb-4 inline-block transition-colors">
-                    <i class="fas fa-chevron-left mr-2"></i> Exit Studio
-                </a>
-                <h1 class="text-4xl font-black text-white tracking-tighter italic">Track <span class="text-indigo-500 text-5xl">Registration</span></h1>
-            </div>
-            <div class="text-right hidden md:block">
-                <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">System Status</p>
-                <p class="text-sm font-bold text-emerald-500">Ready for Uplink</p>
-            </div>
+    <aside class="sidebar">
+        <div class="logo-row">
+            <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
+            <div class="logo-text"><h1>SysAdmin</h1><p>Executive Console</p></div>
+        </div>
+        <div class="nav-label">Management</div>
+        <a th:href="@{/dashboard}"                class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
+        <a th:href="@{/add-artist}"               class="nav-link"><i class="fas fa-users-gear"></i> Artists &amp; Payouts</a>
+        <a th:href="@{/label/track-registration}" class="nav-link active"><i class="fas fa-compact-disc"></i> Track Registry</a>
+        <a th:href="@{/admin/events}"             class="nav-link"><i class="fas fa-calendar-star"></i> Live Events</a>
+        <a th:href="@{/label/analytics}"          class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
+    </aside>
+
+    <main class="main">
+        <div class="page-header">
+            <h2 class="page-title">Track <span>Registry</span></h2>
+            <p class="page-sub">Register new tracks and manage distribution metadata</p>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
-            <div class="lg:col-span-3 glass-panel p-10 rounded-[2.5rem] shadow-2xl shadow-black/50">
-                <form th:action="@{/label/save-track}" th:object="${track}" method="post" class="space-y-8">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-3">
-                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Assign Artist Entity</label>
-                            <div class="relative">
-                                <i class="fas fa-user-tie absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
-                                <select th:field="*{artist}" class="input-neo w-full py-4 pl-12 pr-4 rounded-2xl text-white appearance-none cursor-pointer" required>
-                                    <option value="" disabled selected>Select Master Artist</option>
-                                    <option th:each="a : ${artists}" th:value="${a.id}" th:text="${a.name}"></option>
-                                </select>
+        <div class="content-grid">
+            <!-- FORM PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-icon" style="background:var(--pl);color:var(--ap)"><i class="fas fa-compact-disc"></i></div>
+                    <span class="panel-title">Register New Track</span>
+                </div>
+                <div class="panel-body">
+                    <form th:action="@{/label/save-track}" th:object="${track}" method="post">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Artist</label>
+                                <div class="input-wrap">
+                                    <i class="fas fa-user input-icon"></i>
+                                    <select th:field="*{artist}" class="form-input" required>
+                                        <option value="" disabled selected>Select artist...</option>
+                                        <option th:each="a : ${artists}" th:value="${a.id}" th:text="${a.name}"></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Track Title</label>
+                                <div class="input-wrap">
+                                    <i class="fas fa-music input-icon"></i>
+                                    <input type="text" th:field="*{title}" class="form-input" placeholder="e.g. Midnight Drive" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">ISRC Code</label>
+                                <input type="text" class="form-input no-icon" placeholder="US-RC1-23-00001">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Release Date</label>
+                                <input type="date" class="form-input no-icon">
                             </div>
                         </div>
 
-                        <div class="space-y-3">
-                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Production Title</label>
-                            <div class="relative">
-                                <i class="fas fa-music absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
-                                <input type="text" th:field="*{title}" class="input-neo w-full py-4 pl-12 pr-4 rounded-2xl text-white placeholder-slate-700" placeholder="e.g. Midnight City" required>
+                        <div class="toggle-row">
+                            <div class="toggle-label">
+                                <h4>Spatial Audio &amp; AI Mastering</h4>
+                                <p>Enable enhanced distribution settings</p>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-3">
-                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">ISRC Identification</label>
-                            <input type="text" class="input-neo w-full py-4 px-6 rounded-2xl text-white placeholder-slate-700 uppercase" placeholder="US-RC1-23-45678">
+                            <button type="button" class="toggle">
+                                <div class="toggle-thumb"></div>
+                            </button>
                         </div>
 
-                        <div class="space-y-3">
-                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Target Launch Date</label>
-                            <input type="date" class="input-neo w-full py-4 px-6 rounded-2xl text-white placeholder-slate-700">
-                        </div>
-                    </div>
-
-                    <div class="p-6 bg-indigo-500/5 rounded-3xl border border-indigo-500/10 flex items-center justify-between">
-                        <div>
-                            <h4 class="text-sm font-bold text-white">Advanced Distribution Meta</h4>
-                            <p class="text-[10px] text-slate-500 uppercase">Enable Dolby Atmos & 3D Spatial Audio</p>
-                        </div>
-                        <div class="w-12 h-6 bg-slate-800 rounded-full relative p-1 cursor-pointer">
-                            <div class="w-4 h-4 bg-indigo-500 rounded-full"></div>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-black py-5 rounded-2xl hover:bg-white hover:text-black transition-all duration-500 shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-4 group">
-                        PROCEED WITH ENROLLMENT 
-                        <i class="fas fa-arrow-right text-xs transform group-hover:translate-x-2 transition-transform"></i>
-                    </button>
-                </form>
+                        <button type="submit" class="btn-register">
+                            <i class="fas fa-upload"></i> Register Track
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <div class="lg:col-span-2 space-y-8">
-                <div class="glass-panel p-8 rounded-[2.5rem] h-full">
-                    <h3 class="text-xl font-black text-white mb-6 italic tracking-tight">Market Projection</h3>
-                    <div class="h-64 mb-8">
+            <!-- SIDEBAR PANEL -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-icon" style="background:var(--pm);color:var(--at)"><i class="fas fa-chart-line"></i></div>
+                    <span class="panel-title">Market Projection</span>
+                </div>
+                <div class="chart-panel-body">
+                    <div style="height:200px;margin-bottom:20px">
                         <canvas id="marketChart"></canvas>
                     </div>
-                    
-                    <div class="space-y-4">
-                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                            <p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Estimated Monthly Streams</p>
-                            <p class="text-2xl font-black text-indigo-400">1.2M - 4.8M</p>
-                        </div>
-                        <div class="p-4 bg-white/5 rounded-2xl border border-white/5">
-                            <p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Platform Compatibility</p>
-                            <div class="flex gap-4 mt-2 text-xl text-slate-400">
-                                <i class="fab fa-spotify hover:text-[#1DB954] transition-colors"></i>
-                                <i class="fab fa-apple hover:text-white transition-colors"></i>
-                                <i class="fab fa-youtube hover:text-[#FF0000] transition-colors"></i>
-                                <i class="fab fa-amazon hover:text-[#FF9900] transition-colors"></i>
-                            </div>
+                    <div class="stat-row">
+                        <span class="stat-row-label">Est. Stream Range</span>
+                        <span class="stat-row-value">1.2M – 4.8M</span>
+                    </div>
+                    <div style="padding:14px 16px;background:rgba(248,246,255,0.7);border:1px solid rgba(180,160,220,0.18);border-radius:12px">
+                        <div class="stat-row-label" style="margin-bottom:10px">Platform Compatibility</div>
+                        <div class="platform-icons">
+                            <i class="fab fa-spotify"></i>
+                            <i class="fab fa-apple"></i>
+                            <i class="fab fa-youtube"></i>
+                            <i class="fab fa-amazon"></i>
+                            <i class="fab fa-soundcloud"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -128,30 +199,30 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5'],
+                    labels: ['Week 1','Week 2','Week 3','Week 4','Week 5'],
                     datasets: [{
-                        label: 'Projected Reach',
                         data: [10, 35, 25, 65, 90],
-                        borderColor: '#6366f1',
-                        borderWidth: 4,
-                        pointBackgroundColor: '#6366f1',
+                        borderColor: '#9b7fd4',
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#4daa90',
+                        pointBorderColor: '#4daa90',
+                        pointRadius: 4,
                         tension: 0.4,
                         fill: true,
-                        backgroundColor: (context) => {
-                            const gradient = context.chart.ctx.createLinearGradient(0, 0, 0, 400);
-                            gradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
-                            gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
-                            return gradient;
-                        },
+                        backgroundColor: (ctx) => {
+                            const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+                            g.addColorStop(0, 'rgba(155,127,212,0.25)');
+                            g.addColorStop(1, 'rgba(155,127,212,0)');
+                            return g;
+                        }
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
-                        y: { display: false }
+                        x: { grid: { display: false }, ticks: { color: '#a09bbf', font: { size: 10, weight: 'bold', family: 'Nunito' } } },
+                        y: { display: false, min: 0 }
                     }
                 }
             });

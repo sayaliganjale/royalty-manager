@@ -25,6 +25,8 @@ public class RoyaltyController {
         model.addAttribute("totalArtists", royaltyService.getTotalArtistsCount());
         model.addAttribute("totalTracks", royaltyService.getTotalTracksCount());
         model.addAttribute("totalRevenue", royaltyService.getTotalRevenue());
+        model.addAttribute("totalEventRevenue", royaltyService.getTotalEventRevenue());
+        model.addAttribute("ticketPurchases", royaltyService.getAllTicketPurchases());
         
         // Table data (Transactions)
         model.addAttribute("transactions", royaltyService.getAllTransactions());

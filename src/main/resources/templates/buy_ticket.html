@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book Ticket | LiveStudio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pastel-lavender: #e8e0f5;
+            --pastel-rose: #fce8ee;
+            --pastel-mint: #ddf5ee;
+            --accent-purple: #9b7fd4;
+            --accent-pink: #e07ca0;
+            --accent-teal: #4daa90;
+            --text-dark: #2d2746;
+            --text-mid: #6b6489;
+            --text-light: #a09bbf;
+            --card-border: rgba(180, 160, 220, 0.25);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: linear-gradient(135deg, #f0ebff 0%, #fce8ee 40%, #dceefb 75%, #ddf5ee 100%);
+            font-family: 'Inter', sans-serif; color: var(--text-dark);
+            min-height: 100vh; display: flex; align-items: center; justify-content: center;
+            padding: 32px 16px; overflow-x: hidden;
+        }
+        h1,h2,h3,h4,h5 { font-family: 'Nunito', sans-serif; }
+        .blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.4; z-index: 0; pointer-events: none; animation: drift 18s ease-in-out infinite alternate; }
+        .blob-1 { width: 480px; height: 480px; background: var(--pastel-lavender); top: -10%; left: -10%; animation-duration: 20s; }
+        .blob-2 { width: 380px; height: 380px; background: var(--pastel-rose); bottom: 0; right: -8%; animation-duration: 16s; animation-delay: -5s; }
+        .blob-3 { width: 300px; height: 300px; background: var(--pastel-mint); bottom: 20%; left: 5%; animation-duration: 24s; animation-delay: -12s; }
+        @keyframes drift { 0% { transform: translate(0,0) scale(1); } 100% { transform: translate(30px,25px) scale(1.07); } }
+        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+
+        .back-link {
+            position: fixed; top: 24px; left: 24px; z-index: 200;
+            display: inline-flex; align-items: center; gap: 8px;
+            background: white; border: 1px solid var(--card-border);
+            padding: 9px 16px; border-radius: 30px;
+            font-size: 0.75rem; font-weight: 700; color: var(--text-mid);
+            text-decoration: none; box-shadow: 0 4px 16px rgba(155,127,212,0.1);
+            transition: all 0.25s ease;
+        }
+        .back-link:hover { color: var(--accent-purple); transform: translateX(-3px); }
+
+        .checkout-card {
+            position: relative; z-index: 10;
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px);
+            border: 1px solid var(--card-border); border-radius: 36px;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.6) inset, 0 24px 80px rgba(155,127,212,0.16), 0 8px 24px rgba(0,0,0,0.05);
+            width: 100%; max-width: 960px;
+            display: flex; flex-direction: column; overflow: hidden;
+        }
+        @media(min-width: 768px) { .checkout-card { flex-direction: row; } }
+
+        .details-pane {
+            background: linear-gradient(160deg, var(--pastel-lavender) 0%, var(--pastel-rose) 100%);
+            padding: 48px 40px; display: flex; flex-direction: column;
+            justify-content: space-between; position: relative; overflow: hidden; flex: 0 0 38%;
+        }
+        .details-pane::before { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; background: rgba(255,255,255,0.45); border-radius: 50%; filter: blur(30px); }
+
+        .details-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.65); border: 1px solid rgba(155,127,212,0.2);
+            padding: 5px 14px; border-radius: 20px; margin-bottom: 20px;
+            font-size: 0.65rem; font-weight: 800; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--accent-purple);
+        }
+        .details-badge .dot { width: 6px; height: 6px; background: var(--accent-purple); border-radius: 50%; animation: blink 1.4s infinite; }
+        .event-title { font-size: 2rem; font-weight: 900; color: var(--text-dark); line-height: 1.1; letter-spacing: -0.8px; margin-bottom: 6px; }
+        .event-artist { font-size: 0.95rem; font-weight: 700; color: var(--accent-purple); margin-bottom: 32px; }
+        .detail-item { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .detail-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.7); border: 1px solid rgba(155,127,212,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .detail-label { font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-light); margin-bottom: 2px; }
+        .detail-value { font-size: 0.85rem; font-weight: 700; color: var(--text-dark); }
+        .price-block { background: rgba(255,255,255,0.65); border: 1px solid rgba(155,127,212,0.2); border-radius: 18px; padding: 22px 26px; margin-top: 32px; }
+        .price-block .label { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-light); margin-bottom: 4px; }
+        .price-block .amount { font-family: 'Nunito', sans-serif; font-size: 2.6rem; font-weight: 900; color: var(--text-dark); letter-spacing: -1.5px; }
+
+        .checkout-pane { flex: 1; padding: 48px 40px; overflow-y: auto; max-height: 90vh; }
+        .checkout-pane::-webkit-scrollbar { width: 4px; }
+        .checkout-pane::-webkit-scrollbar-thumb { background: var(--pastel-lavender); border-radius: 10px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; padding-bottom: 18px; border-bottom: 1px solid rgba(180,160,220,0.2); }
+        .section-title { font-size: 1.3rem; font-weight: 900; color: var(--text-dark); }
+        .secure-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-teal); background: var(--pastel-mint); padding: 5px 12px; border-radius: 20px; }
+        .form-label { display: block; font-size: 0.67rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 7px; }
+        .form-input { width: 100%; padding: 13px 16px; background: rgba(248,246,255,0.8); border: 1.5px solid rgba(180,160,220,0.3); border-radius: 13px; font-family: 'Inter', sans-serif; font-size: 0.87rem; font-weight: 600; color: var(--text-dark); transition: border-color 0.2s, box-shadow 0.2s; outline: none; }
+        .form-input:focus { border-color: var(--accent-purple); box-shadow: 0 0 0 4px rgba(155,127,212,0.12); background: white; }
+        .form-input::placeholder { color: var(--text-light); font-weight: 500; }
+        .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .tier-label-header { display: block; font-size: 0.67rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-light); margin-bottom: 10px; }
+        .tier-option { position: relative; margin-bottom: 8px; }
+        .tier-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+        .tier-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-radius: 14px; border: 1.5px solid rgba(180,160,220,0.25); background: rgba(248,246,255,0.6); cursor: pointer; transition: all 0.2s ease; }
+        .tier-card:hover { border-color: rgba(155,127,212,0.45); background: white; }
+        .tier-option input:checked + .tier-card { border-color: var(--accent-purple); background: var(--pastel-lavender); box-shadow: 0 4px 16px rgba(155,127,212,0.18); }
+        .tier-name { font-weight: 800; font-size: 0.88rem; color: var(--text-dark); }
+        .tier-desc { font-size: 0.68rem; color: var(--text-mid); margin-top: 2px; }
+        .tier-mult { font-size: 0.68rem; font-weight: 800; background: rgba(155,127,212,0.1); color: var(--accent-purple); padding: 3px 11px; border-radius: 20px; white-space: nowrap; }
+        .tier-option input:checked + .tier-card .tier-mult { background: var(--accent-purple); color: white; }
+
+        .payment-section { border-top: 1px solid rgba(180,160,220,0.2); padding-top: 24px; margin-top: 4px; }
+        .payment-title { display: flex; align-items: center; gap: 8px; font-size: 0.67rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-mid); margin-bottom: 16px; }
+
+        .btn-pay { width: 100%; padding: 17px 28px; background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink)); color: white; font-family: 'Nunito', sans-serif; font-size: 0.95rem; font-weight: 900; border: none; border-radius: 16px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 8px 28px rgba(155,127,212,0.35); transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s; margin-top: 24px; }
+        .btn-pay:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(155,127,212,0.48); }
+        .secure-footer { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.67rem; color: var(--text-light); font-weight: 600; margin-top: 16px; text-transform: uppercase; letter-spacing: 0.08em; }
+        .mb16 { margin-bottom: 16px; }
+        .mb20 { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <a th:href="@{/events}" class="back-link"><i class="fas fa-arrow-left"></i> Back to Events</a>
+
+    <div class="checkout-card">
+        <!-- LEFT PANE -->
+        <div class="details-pane">
+            <div>
+                <div class="details-badge"><span class="dot"></span> Secure Checkout</div>
+                <h1 class="event-title" th:text="${event.name}">Event Name</h1>
+                <p class="event-artist" th:text="${event.artist.name}">Artist</p>
+                <div class="detail-item">
+                    <div class="detail-icon" style="color:var(--accent-purple)"><i class="fas fa-calendar-alt"></i></div>
+                    <div>
+                        <div class="detail-label">Date</div>
+                        <div class="detail-value" th:text="${#temporals.format(event.eventDate, 'MMMM dd, yyyy')}">Date</div>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-icon" style="color:var(--accent-pink)"><i class="fas fa-location-dot"></i></div>
+                    <div>
+                        <div class="detail-label">Venue</div>
+                        <div class="detail-value" th:text="${event.venue}">Venue</div>
+                    </div>
+                </div>
+            </div>
+            <div class="price-block">
+                <div class="label">Base Ticket Price</div>
+                <div class="amount" th:text="${'$' + #numbers.formatDecimal(event.ticketPrice, 1, 2)}">$0.00</div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANE -->
+        <div class="checkout-pane">
+            <div class="section-header">
+                <h2 class="section-title">Book Your <span style="color:var(--accent-purple)">Tickets</span></h2>
+                <div class="secure-badge"><i class="fas fa-shield-halved"></i> Secure</div>
+            </div>
+
+            <form th:action="@{'/events/' + ${event.id} + '/purchase'}" method="post">
+                <div class="form-row2 mb20">
+                    <div>
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="buyerName" class="form-input" placeholder="Jane Smith" required>
+                    </div>
+                    <div>
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="buyerEmail" class="form-input" placeholder="jane@example.com" required>
+                    </div>
+                </div>
+
+                <div class="mb20">
+                    <span class="tier-label-header">Select Ticket Type</span>
+                    <div class="tier-option">
+                        <input type="radio" name="ticketType" id="tier-ga" value="General Admission" checked onchange="updateTotal()">
+                        <label class="tier-card" for="tier-ga">
+                            <div><div class="tier-name">General Admission</div><div class="tier-desc">Standard entry to the event</div></div>
+                            <div class="tier-mult">1.0× Base</div>
+                        </label>
+                    </div>
+                    <div class="tier-option">
+                        <input type="radio" name="ticketType" id="tier-vip" value="VIP Access" onchange="updateTotal()">
+                        <label class="tier-card" for="tier-vip">
+                            <div><div class="tier-name">VIP Access</div><div class="tier-desc">Early entry + premium seats</div></div>
+                            <div class="tier-mult">2.0× Base</div>
+                        </label>
+                    </div>
+                    <div class="tier-option">
+                        <input type="radio" name="ticketType" id="tier-mg" value="Meet &amp; Greet" onchange="updateTotal()">
+                        <label class="tier-card" for="tier-mg">
+                            <div><div class="tier-name">Meet &amp; Greet</div><div class="tier-desc">Backstage + personal meet</div></div>
+                            <div class="tier-mult">3.5× Base</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb20">
+                    <label class="form-label">Number of Tickets</label>
+                    <select name="quantity" id="ticketQty" class="form-input" onchange="updateTotal()" required>
+                        <option value="1">1 Ticket</option>
+                        <option value="2">2 Tickets</option>
+                        <option value="3">3 Tickets</option>
+                        <option value="4">4 Tickets</option>
+                        <option value="5">5 Tickets (Max)</option>
+                    </select>
+                </div>
+
+                <input type="hidden" name="amount" id="formAmount" th:value="${event.ticketPrice}">
+
+                <div class="payment-section">
+                    <div class="payment-title"><i class="fas fa-credit-card" style="color:var(--accent-purple)"></i> Payment Details</div>
+                    <div class="mb16">
+                        <label class="form-label">Card Number</label>
+                        <input type="text" class="form-input" placeholder="0000  0000  0000  0000" maxlength="19" required>
+                    </div>
+                    <div class="form-row2">
+                        <div>
+                            <label class="form-label">Expiry</label>
+                            <input type="text" class="form-input" placeholder="MM / YY" maxlength="5" required>
+                        </div>
+                        <div>
+                            <label class="form-label">CVV</label>
+                            <input type="password" class="form-input" placeholder="•••" maxlength="3" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-pay">
+                    <span style="display:flex;align-items:center;gap:10px"><i class="fas fa-lock"></i> Confirm &amp; Pay</span>
+                    <span id="submitTotal" th:text="${'$' + #numbers.formatDecimal(event.ticketPrice, 1, 2)}">$0.00</span>
+                </button>
+                <div class="secure-footer"><i class="fas fa-shield-halved" style="color:var(--accent-teal)"></i> 256-bit SSL · Payments Secured</div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const unitPrice = /*[[${event.ticketPrice}]]*/ 0;
+        function getMultiplier() {
+            const types = document.getElementsByName('ticketType');
+            for (let i = 0; i < types.length; i++) {
+                if (types[i].checked) {
+                    if (types[i].value === 'VIP Access')   return 2.0;
+                    if (types[i].value === 'Meet & Greet') return 3.5;
+                    return 1.0;
+                }
+            }
+            return 1.0;
+        }
+        function updateTotal() {
+            const qty = parseInt(document.getElementById('ticketQty').value);
+            const total = (qty * unitPrice * getMultiplier()).toFixed(2);
+            document.getElementById('submitTotal').innerText = '$' + total;
+            document.getElementById('formAmount').value = total;
+        }
+        /*]]>*/
+    </script>
+</body>
+</html>

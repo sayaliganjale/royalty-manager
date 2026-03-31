@@ -20,6 +20,8 @@ public class RoyaltyService {
     @Autowired private ArtistRepository artistRepo;
     @Autowired private TrackRepository trackRepo;
     @Autowired private ContractRepository contractRepo;
+    @Autowired private EventRepository eventRepo;
+    @Autowired private TicketPurchaseRepository ticketRepo;
 
     // Stats Retrieval
     public List<RoyaltyTransaction> getAllTransactions() { return transactionRepo.findAll(); }
@@ -31,6 +33,55 @@ public class RoyaltyService {
         return transactionRepo.findAll().stream()
                 .mapToDouble(RoyaltyTransaction::getGrossRevenue)
                 .sum();
+    }
+
+    // Event & Ticket Logic
+    public List<Event> getAllEvents() { return eventRepo.findAll(); }
+    public Event getEventById(Long id) { return eventRepo.findById(id).orElse(null); }
+    public void saveEvent(Event event) { eventRepo.save(event); }
+
+    public void purchaseTicket(Long eventId, String buyerName, String buyerEmail, Integer quantity, String ticketType, Double totalAmount) {
+        Event event = getEventById(eventId);
+        if (event != null) {
+            // Re-calculate the price on backend for security
+            double multiplier = 1.0;
+            if ("VIP Access".equalsIgnoreCase(ticketType)) multiplier = 2.0;
+            else if ("Meet & Greet".equalsIgnoreCase(ticketType)) multiplier = 3.5;
+            
+            double calculatedAmount = event.getTicketPrice() * quantity * multiplier;
+            
+            TicketPurchase purchase = new TicketPurchase(event, buyerName, buyerEmail, quantity, calculatedAmount, ticketType);
+            ticketRepo.save(purchase);
+        }
+    }
+
+    public List<TicketPurchase> getAllTicketPurchases() { 
+        return ticketRepo.findAll(); 
+    }
+
+    public List<TicketPurchase> getTicketPurchasesByArtist(Long artistId) {
+        List<Event> artistEvents = eventRepo.findByArtistId(artistId);
+        List<Long> eventIds = artistEvents.stream().map(Event::getId).toList();
+        return ticketRepo.findAll().stream()
+                .filter(p -> eventIds.contains(p.getEvent().getId()))
+                .toList();
+    }
+
+    public double getTotalEventRevenue() {
+        return ticketRepo.findAll().stream()
+                .mapToDouble(TicketPurchase::getTotalAmount)
+                .sum();
+    }
+
+    public double getEventRevenueForArtist(Long artistId) {
+        List<Event> artistEvents = eventRepo.findByArtistId(artistId);
+        double totalRevenue = 0.0;
+        for(Event event : artistEvents) {
+            List<TicketPurchase> purchases = ticketRepo.findByEventId(event.getId());
+            double eventRevenue = purchases.stream().mapToDouble(TicketPurchase::getTotalAmount).sum();
+            totalRevenue += eventRevenue;
+        }
+        return totalRevenue;
     }
 
     // Save Logic

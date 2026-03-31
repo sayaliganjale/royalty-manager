@@ -1,86 +1,301 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <title>Onboard New Artist | AuditPro</title>
+    <title>Add Artist | Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
-        body { background: #020617; }
-        .form-glass {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        :root {
+            --pl: #e8e0f5;
+            --pr: #fce8ee;
+            --pm: #ddf5ee;
+            --ps: #dceefb;
+            --ap: #9b7fd4;
+            --ak: #e07ca0;
+            --at: #4daa90;
+            --ab: #5ba3d9;
+            --td: #2d2746;
+            --tm: #6b6489;
+            --tl: #a09bbf;
+            --cb: rgba(180, 160, 220, 0.22);
         }
-        .input-field {
-            background: rgba(2, 6, 23, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        .input-field:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+
+        body {
+            background: linear-gradient(135deg, #f0ebff 0%, #fce8ee 40%, #dceefb 75%, #ddf5ee 100%);
+            font-family: 'Inter', sans-serif;
+            color: var(--td);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px 16px;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .4;
+            z-index: 0;
+            pointer-events: none;
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+
+        .b1 {
+            width: 460px;
+            height: 460px;
+            background: var(--pl);
+            top: -10%;
+            left: -8%;
+        }
+
+        .b2 {
+            width: 360px;
+            height: 360px;
+            background: var(--pr);
+            bottom: 0;
+            right: -8%;
+            animation-delay: -5s;
+        }
+
+        .b3 {
+            width: 300px;
+            height: 300px;
+            background: var(--pm);
+            bottom: 15%;
+            left: 5%;
+            animation-delay: -12s;
+        }
+
+        @keyframes drift {
+            0% {
+                transform: translate(0, 0) scale(1)
+            }
+
+            100% {
+                transform: translate(28px, 22px) scale(1.07)
+            }
+        }
+
+        .back-link {
+            position: fixed;
+            top: 24px;
+            left: 24px;
+            z-index: 200;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid var(--cb);
+            padding: 9px 16px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--tm);
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(155, 127, 212, 0.1);
+            transition: all 0.25s;
+        }
+
+        .back-link:hover {
+            color: var(--ap);
+            transform: translateX(-3px);
+        }
+
+        .card {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(28px);
+            border: 1px solid var(--cb);
+            border-radius: 32px;
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6) inset, 0 24px 70px rgba(155, 127, 212, 0.15);
+            width: 100%;
+            max-width: 500px;
+            padding: 48px 44px;
+        }
+
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--ap), var(--at));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.4rem;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 24px rgba(155, 127, 212, 0.35);
+        }
+
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--td);
+            text-align: center;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .card-sub {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--tl);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 36px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.66rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--tl);
+            margin-bottom: 7px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--tl);
+            font-size: 0.85rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 13px 14px 13px 40px;
+            background: rgba(248, 246, 255, 0.9);
+            border: 1.5px solid rgba(180, 160, 220, 0.28);
+            border-radius: 13px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.87rem;
+            font-weight: 600;
+            color: var(--td);
             outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--ap);
+            box-shadow: 0 0 0 4px rgba(155, 127, 212, 0.12);
+            background: white;
+        }
+
+        .form-input::placeholder {
+            color: var(--tl);
+            font-weight: 400;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--ap), var(--ak));
+            color: white;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 900;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(155, 127, 212, 0.35);
+            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(155, 127, 212, 0.48);
+        }
+
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 0.67rem;
+            color: var(--tl);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 22px;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
 
-    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10">
-        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 rounded-full blur-[120px]"></div>
-    </div>
+<body>
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <a th:href="@{/dashboard}" class="back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
 
-    <div class="w-full max-w-xl">
-        <a th:href="@{/dashboard}" class="inline-flex items-center text-slate-500 hover:text-indigo-400 mb-8 transition-colors group">
-            <i class="fas fa-arrow-left mr-2 transform group-hover:-translate-x-1 transition-transform"></i> 
-            <span class="text-xs font-bold uppercase tracking-widest">Return to Command Center</span>
-        </a>
+    <div class="card">
+        <div class="card-icon"><i class="fas fa-user-plus"></i></div>
+        <h2 class="card-title">Add New Artist</h2>
+        <p class="card-sub">Register an artist to the platform</p>
 
-        <div class="form-glass p-10 rounded-[2.5rem]">
-            <div class="mb-10 text-center">
-                <div class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/20">
-                    <i class="fas fa-user-plus text-white text-2xl"></i>
+        <form th:action="@{/save-artist}" th:object="${artist}" method="post">
+            <div class="form-group">
+                <label class="form-label">Artist / Stage Name</label>
+                <div class="input-wrap">
+                    <i class="fas fa-microphone input-icon"></i>
+                    <input type="text" th:field="*{name}" class="form-input" placeholder="e.g. Aria Stone" required>
                 </div>
-                <h2 class="text-3xl font-black text-white tracking-tight">Artist Onboarding</h2>
-                <p class="text-slate-500 text-sm mt-2">Create a new artist profile in the ecosystem.</p>
             </div>
-
-            <form th:action="@{/save-artist}" th:object="${artist}" method="post" class="space-y-6">
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1">Legal Name / Stage Name</label>
-                    <div class="relative">
-                        <i class="fas fa-signature absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
-                        <input type="text" th:field="*{name}" class="input-field w-full py-4 pl-12 pr-4 rounded-2xl text-white placeholder-slate-700" placeholder="e.g. Noah Rhodes" required>
-                    </div>
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <div class="input-wrap">
+                    <i class="fas fa-at input-icon"></i>
+                    <input type="email" th:field="*{email}" class="form-input" placeholder="artist@example.com"
+                        required>
                 </div>
+            </div>
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-user-check"></i> Register Artist
+            </button>
+        </form>
 
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1">Official Email Address</label>
-                    <div class="relative">
-                        <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-600"></i>
-                        <input type="email" th:field="*{email}" class="input-field w-full py-4 pl-12 pr-4 rounded-2xl text-white placeholder-slate-700" placeholder="artist@example.com" required>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2 ml-1">Artist Biography (Optional)</label>
-                    <textarea class="input-field w-full p-4 rounded-2xl text-white placeholder-slate-700 h-32 resize-none" placeholder="Brief background of the artist..."></textarea>
-                </div>
-
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-white text-black font-black py-5 rounded-2xl hover:bg-indigo-600 hover:text-white transition-all duration-300 shadow-xl shadow-white/5 flex items-center justify-center gap-3 group">
-                        Confirm Registration 
-                        <i class="fas fa-chevron-right text-xs transform group-hover:translate-x-1 transition-transform"></i>
-                    </button>
-                </div>
-            </form>
+        <div class="secure-note">
+            <i class="fas fa-shield-halved" style="color:var(--at)"></i>
+            Securely registered to the platform
         </div>
-
-        <p class="text-center text-slate-600 text-[10px] mt-8 uppercase font-bold tracking-widest">
-            AuditPro Security Protocols Active &bull; Version 2.0
-        </p>
     </div>
-
 </body>
+
 </html>

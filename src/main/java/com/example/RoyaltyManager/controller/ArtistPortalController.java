@@ -34,11 +34,21 @@ public class ArtistPortalController {
                 .filter(t -> t.getArtist() != null && t.getArtist().getId().equals(artist.getId()))
                 .collect(Collectors.toList());
 
-        double myEarnings = myTx.stream().mapToDouble(t -> t.getGrossRevenue() * 0.70).sum();
+        double myEarnings = myTx.stream().mapToDouble(t -> t.getGrossRevenue() * (artist.getContractSplit() / 100.0)).sum();
+        
+        // Calculate event ticket earnings using the same split policy
+        double myEventRevenueTotal = royaltyService.getEventRevenueForArtist(artist.getId());
+        double myEventEarnings = myEventRevenueTotal * (artist.getContractSplit() / 100.0);
+
+        List<com.example.RoyaltyManager.model.TicketPurchase> myPurchases = royaltyService.getTicketPurchasesByArtist(artist.getId());
+        int totalFans = myPurchases.stream().mapToInt(com.example.RoyaltyManager.model.TicketPurchase::getQuantity).sum();
 
         model.addAttribute("artist", artist);
         model.addAttribute("myTransactions", myTx);
         model.addAttribute("myEarnings", myEarnings);
+        model.addAttribute("myEventEarnings", myEventEarnings);
+        model.addAttribute("myTicketPurchases", myPurchases);
+        model.addAttribute("totalFans", totalFans);
         
         return "artist_dashboard";
     }
