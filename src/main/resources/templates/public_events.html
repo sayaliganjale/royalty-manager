@@ -1,419 +1,278 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Live Events | LiveStudio</title>
+    <title>Live Events | Elite Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --pastel-lavender: #e8e0f5;
-            --pastel-rose:     #fce8ee;
-            --pastel-peach:    #fdecd8;
-            --pastel-mint:     #ddf5ee;
-            --pastel-sky:      #dceefb;
-            --pastel-lilac:    #f2e8ff;
-            --accent-purple:   #9b7fd4;
-            --accent-pink:     #e07ca0;
-            --accent-peach:    #e8965a;
-            --accent-teal:     #4daa90;
-            --accent-blue:     #5ba3d9;
-            --bg-soft:         #f8f6ff;
-            --text-dark:       #2d2746;
-            --text-mid:        #6b6489;
-            --text-light:      #a09bbf;
-            --card-bg:         rgba(255, 255, 255, 0.82);
-            --card-border:     rgba(180, 160, 220, 0.25);
+            --bg-deep:      #0a061a;
+            --aurora-1:     #3a1c71;
+            --aurora-2:     #d76d77;
+            --aurora-3:     #ffaf7b;
+            --accent-main:  #a855f7; /* Vibrant Violet */
+            --accent-cyan:  #06b6d4; /* Bright Cyan */
+            --accent-pink:  #ec4899; /* Radiant Pink */
+            --glass-bg:     rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --text-ghost:   #e2e8f0;
+            --text-dim:     #94a3b8;
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: linear-gradient(135deg, #f0ebff 0%, #fce8ee 40%, #dceefb 70%, #ddf5ee 100%);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            margin: 0;
-            padding: 0;
+            background-color: var(--bg-deep);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-ghost);
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Soft floating blobs */
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.35;
-            z-index: 0;
-            pointer-events: none;
-            animation: drift 18s ease-in-out infinite alternate;
+        /* --- IMMERSIVE AURORA BACKGROUND --- */
+        .aurora-container {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
-        .blob-1 { width: 500px; height: 500px; background: var(--pastel-lavender); top: -10%; left: -10%; animation-duration: 20s; }
-        .blob-2 { width: 400px; height: 400px; background: var(--pastel-rose);     top: 50%; right: -8%;  animation-duration: 15s; animation-delay: -6s; }
-        .blob-3 { width: 350px; height: 350px; background: var(--pastel-mint);     bottom: 0%; left: 20%; animation-duration: 22s; animation-delay: -10s; }
+        .aurora {
+            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4;
+            animation: auroraMove 25s infinite alternate;
+        }
+        .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
+        .aurora-2 { width: 70vw; height: 70vh; background: var(--aurora-2); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .aurora-3 { width: 50vw; height: 50vh; background: var(--aurora-3); top: 30%; right: 10%; animation-delay: -10s; }
 
-        @keyframes drift {
-            0%   { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(40px, 30px) scale(1.08); }
+        @keyframes auroraMove {
+            0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+            100% { transform: translate(100px, 50px) rotate(30deg) scale(1.1); }
         }
 
-        h1, h2, h3, h4, h5 { font-family: 'Nunito', sans-serif; }
-
-        /* NAV */
+        /* --- ELITE NAV --- */
         nav {
-            position: fixed; top: 0; left: 0; right: 0;
-            z-index: 100;
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(180, 160, 220, 0.2);
-            height: 72px;
-            box-shadow: 0 4px 24px rgba(155, 127, 212, 0.08);
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 80px; display: flex; align-items: center;
+            background: rgba(10, 6, 26, 0.4); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
         }
+        .nav-inner { max-width: 1400px; width: 100%; margin: 0 auto; padding: 0 60px; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Nunito', sans-serif; font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
+        .logo span { color: var(--accent-main); text-shadow: 0 0 20px rgba(168, 85, 247, 0.4); }
+        .nav-links { display: flex; gap: 40px; }
+        .nav-link { 
+            font-size: 0.85rem; font-weight: 700; color: var(--text-dim); text-decoration: none; 
+            text-transform: uppercase; letter-spacing: 0.1em; transition: all 0.3s;
+        }
+        .nav-link:hover, .nav-link.active { color: white; text-shadow: 0 0 10px white; }
+        .nav-link.active { background: rgba(255,255,255,0.08); padding: 8px 20px; border-radius: 30px; }
 
-        .nav-inner {
-            max-width: 1280px; margin: 0 auto; padding: 0 48px;
-            height: 100%; display: flex; align-items: center; justify-content: space-between;
-        }
-
-        .logo {
-            font-family: 'Nunito', sans-serif;
-            font-weight: 900;
-            font-size: 1.6rem;
-            color: var(--text-dark);
-            letter-spacing: -0.5px;
-        }
-        .logo span { color: var(--accent-purple); }
-
-        .nav-links { display: flex; gap: 36px; align-items: center; }
-        .nav-link {
-            font-size: 0.78rem; font-weight: 700; letter-spacing: 0.08em;
-            text-transform: uppercase; color: var(--text-mid);
-            text-decoration: none; transition: color 0.2s;
-        }
-        .nav-link:hover, .nav-link.active { color: var(--accent-purple); }
-        .nav-link.active {
-            background: var(--pastel-lavender);
-            padding: 6px 16px; border-radius: 20px;
-        }
-
-        /* HERO */
-        .hero {
-            padding: 130px 48px 60px;
-            max-width: 1280px; margin: 0 auto;
-            text-align: center; position: relative; z-index: 1;
-        }
-
+        /* --- HERO --- */
+        .hero { padding: 160px 60px 80px; text-align: center; position: relative; z-index: 1; }
         .hero-badge {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: var(--pastel-lavender);
-            border: 1px solid rgba(155, 127, 212, 0.3);
-            padding: 6px 18px; border-radius: 30px; margin-bottom: 28px;
-            font-size: 0.7rem; font-weight: 800; letter-spacing: 0.15em;
-            text-transform: uppercase; color: var(--accent-purple);
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3);
+            padding: 8px 24px; border-radius: 50px; color: var(--accent-main);
+            font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2rem;
+            margin-bottom: 30px; animation: heroPulse 3s infinite;
         }
-        .hero-badge .dot {
-            width: 7px; height: 7px; background: var(--accent-purple);
-            border-radius: 50%; animation: blink 1.4s ease-in-out infinite;
-        }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-
+        @keyframes heroPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); } 50% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.2); } }
+        
         .hero h2 {
-            font-size: clamp(2.8rem, 6vw, 4.8rem);
-            font-weight: 900; line-height: 1.1;
-            color: var(--text-dark); margin-bottom: 20px; letter-spacing: -1.5px;
+            font-family: 'Nunito', sans-serif; font-size: clamp(3rem, 8vw, 6rem);
+            line-height: 1; margin-bottom: 25px; letter-spacing: -3px; font-weight: 900;
+            animation: floatHero 8s ease-in-out infinite;
         }
         .hero h2 span {
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink), var(--accent-cyan));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
+        @keyframes floatHero { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(1deg); } }
+        .hero p { color: var(--text-dim); max-width: 600px; margin: 0 auto; line-height: 1.8; font-size: 1.2rem; }
 
-        .hero p {
-            font-size: 1.05rem; color: var(--text-mid);
-            max-width: 560px; margin: 0 auto 48px; line-height: 1.7; font-weight: 500;
-        }
-
-        /* SUCCESS ALERT */
-        .success-alert {
-            background: rgba(221, 245, 238, 0.9);
-            border: 1px solid rgba(77, 170, 144, 0.3);
-            border-radius: 16px; padding: 20px 28px;
-            display: flex; align-items: center; gap: 16px;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 20px rgba(77, 170, 144, 0.1);
-        }
-        .success-icon {
-            width: 44px; height: 44px; background: var(--accent-teal);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 1.1rem; flex-shrink: 0;
-        }
-        .success-alert p:first-child { font-weight: 800; color: var(--accent-teal); margin: 0 0 4px; }
-        .success-alert p:last-child  { font-size: 0.78rem; color: var(--text-mid); margin: 0; }
-
-        /* CARDS GRID */
+        /* --- ELITE CARDS --- */
         .events-grid {
-            max-width: 1280px; margin: 0 auto;
-            padding: 0 48px 80px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            max-width: 1400px; margin: 0 auto; padding: 0 60px 120px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 32px; position: relative; z-index: 1;
         }
 
-        /* FLOATING CARD */
         .event-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
-            overflow: hidden;
-            text-decoration: none; color: inherit;
-            display: flex; flex-direction: column;
-            box-shadow: 0 8px 32px rgba(155, 127, 212, 0.1), 0 2px 8px rgba(0,0,0,0.04);
-            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
-            position: relative;
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 40px; text-decoration: none; color: inherit;
+            display: flex; flex-direction: column; overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            opacity: 0; transform: translateY(40px);
+            animation: revealCard 0.8s forwards, floatCard 7s ease-in-out infinite;
         }
+        @keyframes revealCard { to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
         .event-card:hover {
-            transform: translateY(-10px) scale(1.01);
-            box-shadow: 0 24px 60px rgba(155, 127, 212, 0.22), 0 8px 20px rgba(0,0,0,0.06);
-        }
-        .event-card.past {
-            opacity: 0.55; filter: grayscale(0.5); pointer-events: none;
+            transform: translateY(-20px) scale(1.03);
+            border-color: rgba(255,255,255,0.4);
+            box-shadow: 0 40px 100px rgba(168, 85, 247, 0.2);
         }
 
-        /* Card color band */
-        .card-band {
-            height: 8px; width: 100%;
-        }
-        .band-purple { background: linear-gradient(90deg, #b8a0e8, #e8b0d0); }
-        .band-rose   { background: linear-gradient(90deg, #e8a0b8, #f8d0a0); }
-        .band-teal   { background: linear-gradient(90deg, #80cbb8, #a0d8f0); }
-        .band-blue   { background: linear-gradient(90deg, #90bce8, #b8a0e8); }
+        .card-band { height: 10px; width: 100%; border-radius: 0 0 10px 10px; }
+        .band-purple { background: linear-gradient(90deg, #a855f7, #6366f1); }
+        .band-pink   { background: linear-gradient(90deg, #ec4899, #f43f5e); }
+        .band-cyan   { background: linear-gradient(90deg, #06b6d4, #0ea5e9); }
 
-        .card-header {
-            padding: 24px 28px 20px;
-            position: relative; overflow: hidden;
-        }
-        .card-header::before {
-            content: '';
-            position: absolute; top: -40px; right: -40px;
-            width: 130px; height: 130px; border-radius: 50%;
-            background: var(--pastel-lavender); opacity: 0.6;
-            transition: opacity 0.3s;
-        }
-        .event-card:hover .card-header::before { opacity: 1; }
+        .card-header { padding: 30px 30px 15px; }
+        .artist-label { color: var(--accent-main); font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 8px; display: block; }
+        .event-name { font-family: 'Nunito', sans-serif; font-size: 1.8rem; font-weight: 900; line-height: 1.1; color: white; letter-spacing: -0.5px; }
 
-        .artist-label {
-            font-size: 0.68rem; font-weight: 800; letter-spacing: 0.15em;
-            text-transform: uppercase; color: var(--accent-purple);
-            margin-bottom: 6px; display: block;
+        .card-body { padding: 0 30px 30px; flex: 1; display: flex; flex-direction: column; }
+        .card-meta { 
+            display: flex; align-items: center; gap: 20px;
+            background: rgba(255,255,255,0.04); border-radius: 20px; padding: 20px; margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.03);
         }
-        .event-card:nth-child(3n+2) .artist-label { color: var(--accent-pink); }
-        .event-card:nth-child(3n+3) .artist-label { color: var(--accent-teal); }
-
-        .event-name {
-            font-family: 'Nunito', sans-serif;
-            font-size: 1.55rem; font-weight: 900;
-            color: var(--text-dark); line-height: 1.2; letter-spacing: -0.5px;
-        }
-
-        .card-body { padding: 0 28px 28px; flex: 1; display: flex; flex-direction: column; }
-
-        .card-meta {
-            display: flex; align-items: center; gap: 10px;
-            padding: 14px 16px;
-            background: var(--pastel-lavender); border-radius: 14px;
-            margin-bottom: 20px;
-        }
-        .event-card:nth-child(3n+2) .card-meta { background: var(--pastel-rose); }
-        .event-card:nth-child(3n+3) .card-meta { background: var(--pastel-mint); }
-
-        .date-box {
+        .date-box { 
+            width: 64px; height: 64px; background: white; border-radius: 16px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 50px; height: 50px; border-radius: 12px;
-            background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.06); flex-shrink: 0;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2); flex-shrink: 0;
         }
-        .date-box .day   { font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 900; color: var(--text-dark); line-height: 1; }
-        .date-box .month { font-size: 0.58rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-purple); }
+        .date-box .day { font-family: 'Nunito', sans-serif; color: #000; font-size: 1.6rem; font-weight: 900; line-height: 1; }
+        .date-box .month { color: var(--accent-main); font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
 
-        .meta-info {}
-        .meta-date   { font-weight: 700; font-size: 0.85rem; color: var(--text-dark); }
-        .meta-venue  { font-size: 0.75rem; color: var(--text-mid); font-weight: 500; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+        .meta-txt .m-date { font-weight: 800; font-size: 1.1rem; color: white; margin-bottom: 4px; }
+        .meta-txt .m-venue { color: var(--text-dim); font-size: 0.85rem; font-weight: 500; display: flex; align-items: center; gap: 6px; }
 
-        .card-footer {
-            display: flex; align-items: center; justify-content: space-between;
-            padding-top: 20px; border-top: 1px solid rgba(180, 160, 220, 0.18);
-            margin-top: auto;
-        }
-        .price-label { font-size: 0.65rem; color: var(--text-light); font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
-        .price       { font-family: 'Nunito', sans-serif; font-size: 2rem; font-weight: 900; color: var(--text-dark); letter-spacing: -1px; }
+        .card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.06); }
+        .p-label { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; margin-bottom: 4px; }
+        .p-val { font-family: 'Nunito', sans-serif; font-size: 2.4rem; font-weight: 900; color: white; letter-spacing: -1px; }
 
-        .btn-ticket {
-            display: flex; align-items: center; justify-content: center;
-            width: 52px; height: 52px; border-radius: 16px;
-            background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
-            color: white; font-size: 1.1rem;
-            box-shadow: 0 6px 20px rgba(155, 127, 212, 0.35);
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+        .btn-buy { 
+            width: 70px; height: 70px; border-radius: 24px;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink));
+            display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.4);
+            transition: all 0.3s;
         }
-        .event-card:hover .btn-ticket {
-            transform: scale(1.15) rotate(-5deg);
-            box-shadow: 0 10px 28px rgba(155, 127, 212, 0.5);
-        }
-        .event-card:nth-child(3n+2) .btn-ticket { background: linear-gradient(135deg, var(--accent-pink), var(--accent-peach)); }
-        .event-card:nth-child(3n+3) .btn-ticket { background: linear-gradient(135deg, var(--accent-teal), var(--accent-blue)); }
+        .event-card:hover .btn-buy { transform: scale(1.15) rotate(-5deg); box-shadow: 0 15px 50px rgba(168, 85, 247, 0.6); }
 
-        /* PAST CARD BADGE */
-        .past-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 0.65rem; font-weight: 800; letter-spacing: 0.12em;
-            text-transform: uppercase; color: var(--text-light);
-            background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.07);
-            padding: 6px 14px; border-radius: 20px;
+        /* --- MUSIC PORTAL CTA --- */
+        .portal-cta { max-width: 1200px; margin: 0 auto 120px; padding: 0 60px; position: relative; z-index: 1; }
+        .cta-glass {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(6, 182, 212, 0.1));
+            backdrop-filter: blur(30px); border: 2px solid rgba(255,255,255,0.1); border-radius: 50px;
+            padding: 80px 40px; text-align: center;
         }
+        .cta-title { font-size: 3.5rem; font-weight: 900; margin-bottom: 20px; letter-spacing: -2px; }
+        .btn-portal { 
+            display: inline-flex; align-items: center; gap: 15px;
+            background: white; color: black; font-weight: 900; padding: 22px 55px;
+            border-radius: 50px; text-decoration: none; text-transform: uppercase; letter-spacing: 0.1em;
+            transition: all 0.3s; box-shadow: 0 10px 40px rgba(255,255,255,0.2);
+        }
+        .btn-portal:hover { transform: scale(1.08) translateY(-5px); box-shadow: 0 20px 60px rgba(255,255,255,0.4); background: var(--accent-main); color: white; }
 
-        /* EMPTY STATE */
-        .empty-state {
-            grid-column: 1 / -1;
-            background: var(--card-bg);
-            border: 2px dashed rgba(180, 160, 220, 0.35);
-            border-radius: 28px;
-            padding: 80px 48px;
-            text-align: center;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .empty-state i    { font-size: 3.5rem; color: var(--pastel-lavender); margin-bottom: 24px; }
-        .empty-state h3   { font-size: 1.6rem; font-weight: 900; color: var(--text-dark); margin-bottom: 10px; }
-        .empty-state p    { font-size: 0.88rem; color: var(--text-mid); max-width: 360px; }
-
-        /* FOOTER */
-        footer {
-            padding: 32px 48px;
-            border-top: 1px solid rgba(180, 160, 220, 0.2);
-            text-align: center;
-            font-size: 0.72rem; color: var(--text-light);
-            font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-            position: relative; z-index: 1;
-        }
+        footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-top: 1px solid var(--glass-border); position: relative; z-index: 1; }
     </style>
 </head>
 <body>
 
-    <!-- Background blobs -->
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
+    <div class="aurora-container">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+    </div>
 
-    <!-- NAV -->
     <nav>
         <div class="nav-inner">
-            <div class="logo">Live<span>Studio</span></div>
+            <div class="logo">ELITE<span>STUDIO</span></div>
             <div class="nav-links">
                 <a th:href="@{/events}" class="nav-link active">Events</a>
+                <a th:href="@{/music}" class="nav-link">Music Hub</a>
                 <a th:href="@{/artist/login}" class="nav-link">Artist Portal</a>
             </div>
         </div>
     </nav>
 
-    <!-- MAIN -->
     <main>
-        <div class="hero">
-
-            <!-- Success banner -->
-            <div th:if="${param.success}" class="success-alert" style="text-align:left; max-width:680px; margin: 0 auto 40px;">
-                <div class="success-icon"><i class="fas fa-check"></i></div>
-                <div>
-                    <p>Booking Confirmed!</p>
-                    <p>Your tickets have been secured. Check your email for the confirmation details.</p>
-                </div>
-            </div>
-
+        <section class="hero">
             <div class="hero-badge">
-                <span class="dot"></span>
-                Live Events Registry
+                <i class="fas fa-satellite-dish"></i> Live Performance Hub
             </div>
-            <h2>Discover &amp;<br><span>Book Live Events</span></h2>
-            <p>Get front-row access to world-class artists. Every ticket purchase directly supports the creators you love.</p>
+            <h2>Discover &amp;<br><span>Book Elite Events</span></h2>
+            <p>Access the world's most exclusive live performances. Every ticket is a direct contribution to your favorite artists' creative journey.</p>
+        </section>
+
+        <!-- Dynamic Success Alert -->
+        <div th:if="${param.success}" class="portal-cta" style="margin-bottom: 40px;">
+            <div class="cta-glass" style="padding: 30px; border-color: var(--accent-cyan);">
+                <h3 style="color: var(--accent-cyan); font-weight: 900; font-size: 1.5rem;">BOOKING SUCCESSFUL</h3>
+                <p style="margin-top: 10px;">Check your email for your elite access ticket keys.</p>
+            </div>
         </div>
 
-        <!-- EVENTS GRID -->
         <div class="events-grid">
-
             <th:block th:each="event, iterStat : ${events}">
-
+                
                 <!-- ACTIVE EVENT -->
                 <a th:if="${!event.eventDate.isBefore(today)}"
                    th:href="@{'/events/' + ${event.id} + '/buy'}"
-                   class="event-card">
-
-                    <div class="card-band"
-                         th:classappend="${iterStat.index % 3 == 0 ? 'band-purple' : (iterStat.index % 3 == 1 ? 'band-rose' : 'band-teal')}"></div>
-
+                   class="event-card"
+                   th:style="'animation-delay: ' + (${iterStat.index} * 150) + 'ms'">
+                   
                     <div class="card-header">
-                        <span class="artist-label" th:text="${event.artist.name}">Artist Name</span>
+                        <span class="artist-label" th:text="${event.artist.name}">Artist</span>
                         <div class="event-name" th:text="${event.name}">Event Name</div>
                     </div>
-
+                    
                     <div class="card-body">
                         <div class="card-meta">
                             <div class="date-box">
-                                <span class="day"  th:text="${#temporals.format(event.eventDate, 'dd')}">01</span>
+                                <span class="day" th:text="${#temporals.format(event.eventDate, 'dd')}">01</span>
                                 <span class="month" th:text="${#temporals.format(event.eventDate, 'MMM')}">JAN</span>
                             </div>
-                            <div class="meta-info">
-                                <div class="meta-date" th:text="${#temporals.format(event.eventDate, 'MMMM yyyy')}">January 2026</div>
-                                <div class="meta-venue">
-                                    <i class="fas fa-location-dot" style="font-size:0.65rem;"></i>
-                                    <span th:text="${event.venue}">Venue</span>
-                                </div>
+                            <div class="meta-txt">
+                                <div class="m-date" th:text="${#temporals.format(event.eventDate, 'MMMM yyyy')}">January 2026</div>
+                                <div class="m-venue"><i class="fas fa-location-dot"></i> <span th:text="${event.venue}">Venue</span></div>
                             </div>
                         </div>
 
                         <div class="card-footer">
                             <div>
-                                <div class="price-label">Tickets from</div>
-                                <div class="price" th:text="${'$' + #numbers.formatDecimal(event.ticketPrice, 1, 2)}">$0.00</div>
+                                <div class="p-label">Access Pass</div>
+                                <div class="p-val" th:text="${'$' + #numbers.formatDecimal(event.ticketPrice, 1, 2)}">$0.00</div>
                             </div>
-                            <div class="btn-ticket"><i class="fas fa-ticket"></i></div>
+                            <div class="btn-buy"><i class="fas fa-bolt"></i></div>
                         </div>
                     </div>
+                    <div class="card-band" th:classappend="${iterStat.index % 3 == 0 ? 'band-purple' : (iterStat.index % 3 == 1 ? 'band-pink' : 'band-cyan')}"></div>
                 </a>
 
                 <!-- PAST EVENT -->
-                <div th:if="${event.eventDate.isBefore(today)}" class="event-card past">
-                    <div class="card-band band-blue" style="opacity:0.4;"></div>
+                <div th:if="${event.eventDate.isBefore(today)}" class="event-card" style="opacity: 0.4; pointer-events: none;">
                     <div class="card-header">
-                        <span class="artist-label" style="color: var(--text-light);" th:text="${event.artist.name}">Artist</span>
-                        <div class="event-name" style="color: var(--text-mid);" th:text="${event.name}">Event Name</div>
+                        <span class="artist-label" th:text="${event.artist.name}">Artist</span>
+                        <div class="event-name" th:text="${event.name}">Concluded</div>
                     </div>
                     <div class="card-body">
-                        <div class="card-meta" style="background: rgba(0,0,0,0.04);">
-                            <div class="date-box">
-                                <span class="day"   th:text="${#temporals.format(event.eventDate, 'dd')}">01</span>
-                                <span class="month" th:text="${#temporals.format(event.eventDate, 'MMM')}">JAN</span>
-                            </div>
-                            <div class="meta-info">
-                                <div class="meta-date" style="color: var(--text-mid);" th:text="${#temporals.format(event.eventDate, 'MMMM yyyy')}">January 2026</div>
-                                <div class="meta-venue"><i class="fas fa-calendar-xmark"></i> Event Concluded</div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="past-badge"><i class="fas fa-archive"></i> Archived</div>
+                        <div class="card-meta" style="filter: grayscale(1);">
+                            <div class="date-box" style="background: #333;"><span class="day" style="color: #666;">-</span></div>
+                            <div class="meta-txt"><div class="m-date">Event Concluded</div></div>
                         </div>
                     </div>
                 </div>
 
             </th:block>
-
-            <!-- EMPTY -->
-            <div th:if="${events.empty}" class="empty-state">
-                <i class="fas fa-calendar-star"></i>
-                <h3>No Events Scheduled</h3>
-                <p>Check back soon — exciting events from your favourite artists are on their way.</p>
-            </div>
-
         </div>
+
+        <section class="portal-cta">
+            <div class="cta-glass">
+                <h2 class="cta-title">Enter the <span>Music Hub</span></h2>
+                <p style="color: var(--text-dim); margin-bottom: 40px; font-size: 1.1rem;">Listen to 400+ curated tracks while you secure your elite event access.</p>
+                <a th:href="@{/music}" class="btn-portal">
+                    <i class="fas fa-headphones-simple"></i> Experience Hub
+                </a>
+            </div>
+        </section>
     </main>
 
-    <footer>LiveStudio Ticketing &bull; Professional Event Platform &bull; &copy; 2026</footer>
+    <footer>ELITE STUDIO &bull; POWERED BY LIVE STUDIO &copy; 2026</footer>
 
 </body>
 </html>

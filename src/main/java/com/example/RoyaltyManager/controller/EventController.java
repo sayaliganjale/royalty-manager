@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
+import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,6 +25,11 @@ public class EventController {
         model.addAttribute("events", royaltyService.getAllEvents());
         model.addAttribute("today", LocalDate.now());
         return "public_events";
+    }
+
+    @GetMapping("/music")
+    public String musicHubPage() {
+        return "music_library";
     }
 
     @GetMapping("/events/{id}/buy")
@@ -54,7 +60,8 @@ public class EventController {
 
     // Admin Pages
     @GetMapping("/admin/events")
-    public String manageEventsPage(Model model) {
+    public String manageEventsPage(HttpSession session, Model model) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         List<Event> allEvents = royaltyService.getAllEvents();
         LocalDate today = LocalDate.now();
         
@@ -82,7 +89,10 @@ public class EventController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate eventDate,
             @RequestParam String venue,
             @RequestParam Double ticketPrice,
-            @RequestParam Long artistId) {
+            @RequestParam Long artistId,
+            HttpSession session) {
+        
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         
         List<Artist> artists = royaltyService.getAllArtists();
         Artist selectedArtist = artists.stream().filter(a -> a.getId().equals(artistId)).findFirst().orElse(null);

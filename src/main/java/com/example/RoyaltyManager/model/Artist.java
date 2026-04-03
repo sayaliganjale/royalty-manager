@@ -24,6 +24,9 @@ public class Artist {
     @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL)
     private List<RoyaltyTransaction> transactions;
 
+    @OneToMany(mappedBy = "artist", cascade = CascadeType.ALL)
+    private List<Track> tracks;
+
     // --- Constructors ---
     public Artist() {}
 
@@ -76,5 +79,12 @@ public class Artist {
     }
     public void setTransactions(List<RoyaltyTransaction> transactions) { 
         this.transactions = transactions; 
+    }
+
+    public List<Track> getTracks() { 
+        return tracks; 
+    }
+    public void setTracks(List<Track> tracks) { 
+        this.tracks = tracks; 
     }
 }

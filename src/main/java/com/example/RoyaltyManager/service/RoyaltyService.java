@@ -37,8 +37,13 @@ public class RoyaltyService {
 
     // Event & Ticket Logic
     public List<Event> getAllEvents() { return eventRepo.findAll(); }
-    public Event getEventById(Long id) { return eventRepo.findById(id).orElse(null); }
-    public void saveEvent(Event event) { eventRepo.save(event); }
+    public Event getEventById(Long id) { 
+        if (id == null) return null;
+        return eventRepo.findById(id).orElse(null); 
+    }
+    public void saveEvent(Event event) { 
+        if (event != null) eventRepo.save(event); 
+    }
 
     public void purchaseTicket(Long eventId, String buyerName, String buyerEmail, Integer quantity, String ticketType, Double totalAmount) {
         Event event = getEventById(eventId);
@@ -85,9 +90,19 @@ public class RoyaltyService {
     }
 
     // Save Logic
-    public void saveArtist(Artist artist) { artistRepo.save(artist); }
-    public void saveTrack(Track track) { trackRepo.save(track); }
-    public void saveContract(Contract contract) { contractRepo.save(contract); }
+    public void saveArtist(Artist artist) { if (artist != null) artistRepo.save(artist); }
+    public void saveTrack(Track track) { if (track != null) trackRepo.save(track); }
+    public void saveContract(Contract contract) { if (contract != null) contractRepo.save(contract); }
+    public List<Contract> getAllContracts() { return contractRepo.findAll(); }
+
+    public List<ArtistPayoutDTO> getArtistPayouts() {
+        return artistRepo.findAll().stream().map(a -> {
+            long tCount = trackRepo.countByArtistId(a.getId());
+            double gross = a.getTransactions().stream().mapToDouble(RoyaltyTransaction::getGrossRevenue).sum();
+            double net = gross * (a.getContractSplit() / 100.0);
+            return new ArtistPayoutDTO(a.getName(), tCount, gross, net, "ACTIVE");
+        }).toList();
+    }
 
     // CSV Magic
     @Transactional
@@ -116,4 +131,5 @@ public class RoyaltyService {
             }
         }
     }
+    public List<Track> getTracksByArtist(Long artistId) { return trackRepo.findByArtistId(artistId); }
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Artist Login | EliteStudio</title>
+    <title>Admin Login | EliteStudio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
@@ -51,21 +51,6 @@
             100% { transform: translate(100px, 50px) rotate(30deg) scale(1.1); }
         }
 
-        .back-link {
-            position: fixed; top: 30px; left: 30px; z-index: 200;
-            display: inline-flex; align-items: center; gap: 10px;
-            background: var(--glass-bg); backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border); padding: 12px 24px;
-            border-radius: 50px; font-size: 0.8rem; font-weight: 800;
-            color: var(--text-ghost); text-decoration: none;
-            text-transform: uppercase; letter-spacing: 0.1em;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .back-link:hover {
-            background: white; color: black; transform: translateX(-5px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
-        }
-
         .login-card {
             position: relative; z-index: 10;
             width: 100%; max-width: 440px;
@@ -97,9 +82,7 @@
             font-family: 'Nunito', sans-serif; font-size: 2.2rem; font-weight: 900;
             text-align: center; letter-spacing: -1px; margin-bottom: 8px;
             background: linear-gradient(135deg, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .card-sub {
@@ -172,40 +155,38 @@
         <div class="aurora aurora-3"></div>
     </div>
 
-    <a th:href="@{/events}" class="back-link"><i class="fas fa-arrow-left"></i> BACK TO EVENTS</a>
-
     <div class="login-card">
-        <div class="logo-icon"><i class="fas fa-music"></i></div>
-        <h1 class="card-title">Artist Portal</h1>
-        <p class="card-sub">Sign in to your studio console</p>
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <h1 class="card-title">Admin Console</h1>
+        <p class="card-sub">Secure Governance Portal</p>
 
-        <form th:action="@{/artist/do-login}" method="post">
+        <form th:action="@{/admin/do-login}" method="post">
             <div>
-                <label class="form-label">Email Address</label>
+                <label class="form-label">Administrator ID</label>
                 <div class="input-wrap">
-                    <i class="fas fa-at input-icon"></i>
-                    <input type="email" name="email" class="form-input" placeholder="artist@example.com" required>
+                    <i class="fas fa-user-shield input-icon"></i>
+                    <input type="email" name="email" class="form-input" placeholder="admin@livestudio.com" required>
                 </div>
             </div>
             <div>
-                <label class="form-label">Password</label>
+                <label class="form-label">Security Key</label>
                 <div class="input-wrap">
-                    <i class="fas fa-lock input-icon"></i>
+                    <i class="fas fa-key input-icon"></i>
                     <input type="password" name="password" class="form-input" placeholder="••••••••" required>
                 </div>
             </div>
             <button type="submit" class="btn-primary">
-                <i class="fas fa-sign-in-alt"></i> SIGN IN
+                <i class="fas fa-unlock-keyhole"></i> Authorize Access
             </button>
         </form>
 
         <p th:if="${param.error}" class="error-msg">
-            <i class="fas fa-exclamation-circle"></i> Invalid email or password. Please try again.
+            <i class="fas fa-exclamation-triangle"></i> Authorization Failed. Invalid Credentials.
         </p>
 
         <div class="secure-note">
-            <i class="fas fa-shield-halved" style="color:var(--accent-cyan)"></i>
-            Secure Session · SSL Encrypted
+            <i class="fas fa-lock" style="color:var(--accent-cyan)"></i>
+            Governance Level Security · AES-256
         </div>
     </div>
 </body>

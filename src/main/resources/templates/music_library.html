@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Elite Music Hub | EliteStudio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep:      #0a061a;
+            --aurora-1:     #3a1c71;
+            --aurora-2:     #d76d77;
+            --aurora-3:     #ffaf7b;
+            --accent-main:  #a855f7; /* Vibrant Violet */
+            --accent-cyan:  #06b6d4; /* Bright Cyan */
+            --accent-pink:  #ec4899; /* Radiant Pink */
+            --glass-bg:     rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-ghost:   #e2e8f0;
+            --text-dim:     #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-ghost);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- IMMERSIVE AURORA BACKGROUND --- */
+        .aurora-container {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+        }
+        .aurora {
+            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.35;
+            animation: auroraMove 25s infinite alternate;
+        }
+        .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
+        .aurora-2 { width: 70vw; height: 70vh; background: var(--aurora-2); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .aurora-3 { width: 50vw; height: 50vh; background: var(--aurora-3); top: 30%; right: 10%; animation-delay: -10s; }
+
+        @keyframes auroraMove {
+            0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+            100% { transform: translate(100px, 50px) rotate(30deg) scale(1.1); }
+        }
+
+        nav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            height: 80px; display: flex; align-items: center; padding: 0 60px;
+            background: rgba(10, 6, 26, 0.4); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .back-link {
+            display: flex; align-items: center; gap: 12px;
+            color: var(--text-dim); text-decoration: none; font-weight: 700; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 0.15em; transition: all 0.3s;
+        }
+        .back-link:hover { color: white; transform: translateX(-5px); }
+
+        .hub-container {
+            max-width: 1400px; margin: 120px auto 140px; padding: 0 60px;
+            position: relative; z-index: 1;
+        }
+
+        .hub-header { text-align: center; margin-bottom: 80px; }
+        .hub-title {
+            font-family: 'Nunito', sans-serif; font-size: 5rem; font-weight: 900;
+            color: white; letter-spacing: -3px; margin-bottom: 20px;
+            animation: fadeInDown 0.8s backwards, floatHero 8s ease-in-out infinite;
+        }
+        .hub-title span {
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink), var(--accent-cyan));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hub-subtitle { font-size: 1.25rem; color: var(--text-dim); max-width: 700px; margin: 0 auto; }
+
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatHero { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(1deg); } }
+
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 20px;
+        }
+        .section-title { font-family: 'Nunito', sans-serif; font-size: 2.2rem; font-weight: 900; display: flex; align-items: center; gap: 15px; }
+        .section-title i { color: var(--accent-cyan); }
+
+        .music-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 30px; }
+
+        /* --- ELITE MUSIC CARD --- */
+        .m-card {
+            background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border); border-radius: 40px; padding: 20px;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative; overflow: hidden; opacity: 0; transform: translateY(40px);
+            animation: floatCard 8s ease-in-out infinite;
+        }
+        .m-card.revealed { opacity: 1; transform: translateY(0); transition: opacity 0.5s, transform 0.5s; }
+        @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        .m-card:hover {
+            transform: translateY(-20px) scale(1.05);
+            border-color: rgba(255,255,255,0.3);
+            box-shadow: 0 30px 80px rgba(168, 85, 247, 0.25);
+        }
+
+        .m-art-wrapper {
+            position: relative; width: 100%; aspect-ratio: 1;
+            border-radius: 24px; overflow: hidden; margin-bottom: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        .m-art { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s; }
+        .m-card:hover .m-art { transform: scale(1.15); }
+
+        .equalizer {
+            display: none; position: absolute; bottom: 20px; left: 20px;
+            height: 35px; align-items: flex-end; gap: 4px; z-index: 10;
+        }
+        .m-card.active-play .equalizer { display: flex; }
+        .eq-bar { width: 5px; border-radius: 3px; background: white; animation: eqAnim 0.7s infinite; }
+        @keyframes eqAnim { 0%, 100% { height: 6px; } 50% { height: 30px; } }
+
+        .m-overlay {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.4);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .m-card:hover .m-overlay { opacity: 1; }
+        .m-card.active-play .m-overlay { opacity: 1; background: rgba(168, 85, 247, 0.2); }
+
+        .m-play-ring {
+            width: 75px; height: 75px; border-radius: 50%;
+            background: white; color: black; display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; cursor: pointer; transition: all 0.3s;
+        }
+        .m-play-ring:hover { transform: scale(1.1); box-shadow: 0 0 30px white; }
+        .m-play-ring.playing { background: var(--accent-pink); color: white; box-shadow: 0 0 30px var(--accent-pink); }
+
+        .m-info { margin-top: 5px; }
+        .m-track { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 800; color: white; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .m-artist { color: var(--text-dim); font-size: 0.8rem; font-weight: 500; }
+
+        /* SKELETON */
+        .m-card.skeleton { background: rgba(255,255,255,0.03); opacity: 1; animation: shimmer 2s infinite ease-in-out; }
+        @keyframes shimmer { 0% { opacity: 0.4; } 50% { opacity: 0.7; } 100% { opacity: 0.4; } }
+
+        /* --- PERSISTENT PLAYER --- */
+        .player-bar {
+            position: fixed; bottom: 30px; left: 30px; right: 30px;
+            background: rgba(10, 6, 26, 0.7); backdrop-filter: blur(40px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 35px;
+            height: 120px; z-index: 200; transform: translateY(200%);
+            transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex; align-items: center; padding: 0 50px; justify-content: space-between;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+        .player-bar.active { transform: translateY(0); }
+
+        .p-info { display: flex; align-items: center; gap: 20px; width: 350px; }
+        .p-art { width: 80px; height: 80px; border-radius: 20px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+        .p-track { font-weight: 800; font-size: 1.2rem; color: white; }
+        .p-artist { color: var(--text-dim); font-size: 0.85rem; }
+
+        .p-controls { flex: 1; max-width: 600px; display: flex; flex-direction: column; align-items: center; }
+        .p-main { display: flex; align-items: center; gap: 40px; margin-bottom: 15px; }
+        .p-btn { font-size: 1.6rem; color: var(--text-dim); cursor: pointer; transition: 0.3s; }
+        .p-btn:hover { color: white; transform: scale(1.15); }
+        .p-btn-play { 
+            width: 64px; height: 64px; border-radius: 50%; background: white; color: black;
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        .p-timeline-container { width: 100%; display: flex; align-items: center; gap: 20px; }
+        .p-time { font-size: 0.8rem; font-weight: 800; color: var(--text-dim); width: 45px; }
+        .p-timeline { flex: 1; height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; position: relative; cursor: pointer; }
+        .p-progress { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-pink)); width: 0%; box-shadow: 0 0 15px var(--accent-cyan); }
+
+        .load-more-btn {
+            display: flex; margin: 80px auto 0;
+            background: transparent; border: 2px solid var(--glass-border); color: white;
+            padding: 22px 50px; border-radius: 50px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.15em; transition: all 0.3s;
+        }
+        .load-more-btn:hover { background: white; color: black; border-color: white; transform: scale(1.05); }
+
+        /* PARTICLES */
+        #particle-bg { position: fixed; inset: 0; z-index: 1; pointer-events: none; }
+        .music-note { position: absolute; font-size: 1.4rem; color: var(--accent-cyan); opacity: 0; animation: floatNote 10s linear infinite; }
+        @keyframes floatNote {
+            0% { transform: translateY(110vh) rotate(0); opacity: 0; }
+            20% { opacity: 0.3; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aurora-container">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+    </div>
+    <div id="particle-bg"></div>
+
+    <nav>
+        <a th:href="@{/events}" class="back-link">
+            <i class="fas fa-arrow-left"></i> BACK TO EVENTS
+        </a>
+    </nav>
+
+    <main class="hub-container">
+        <header class="hub-header">
+            <h1 class="hub-title">Elite Music <span>Hub</span></h1>
+            <p class="hub-subtitle">Experience the pulse of the digital soundscape. Curated tracks for the elite performance enthusiast.</p>
+        </header>
+
+        <!-- Elite Indian HUB (Dhurandhar, Arijit, Sachet-Parampara) -->
+        <section class="hub-section">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-drum"></i> ELITE INDIAN HUB</h2>
+            </div>
+            <div class="music-grid" id="indianGrid"></div>
+            <button class="load-more-btn" onclick="rotateLoadMode('Indian', this)">Discover More Indian Hits</button>
+        </section>
+
+        <!-- Global HUB (Lana Del Rey Leading) -->
+        <section class="hub-section" style="margin-top: 100px;">
+            <div class="section-header">
+                <h2 class="section-title"><i class="fas fa-globe"></i> GLOBAL TOP CHARTS</h2>
+            </div>
+            <div class="music-grid" id="globalGrid"></div>
+            <button class="load-more-btn" onclick="rotateLoadMode('Global', this)">Explore Global Music</button>
+        </section>
+    </main>
+
+    <div class="player-bar" id="playerBar">
+        <div class="p-info">
+            <img src="" id="pArt" class="p-art" alt="Art">
+            <div class="p-meta">
+                <div class="p-track" id="pTrack">SELECT A TRACK</div>
+                <div class="p-artist" id="pArtist">ELITE STUDIO MUSIC</div>
+            </div>
+        </div>
+        <div class="p-controls">
+            <div class="p-main">
+                <i class="fas fa-random p-btn"></i>
+                <i class="fas fa-step-backward p-btn"></i>
+                <div class="p-btn-play" onclick="togglePlayback()"><i class="fas fa-play" id="pPlayIcon"></i></div>
+                <i class="fas fa-step-forward p-btn"></i>
+                <i class="fas fa-repeat p-btn"></i>
+            </div>
+            <div class="p-timeline-container">
+                <div class="p-time" id="currentTime">0:00</div>
+                <div class="p-timeline" onclick="seek(event)">
+                    <div class="p-progress" id="pProgress"></div>
+                </div>
+                <div class="p-time">0:30</div>
+            </div>
+        </div>
+        <div style="width: 350px; display: flex; align-items: center; justify-content: flex-end; gap: 20px; opacity: 0.5;">
+            <i class="fas fa-volume-high p-btn" style="font-size: 1.1rem;"></i>
+            <div style="width: 100px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px;"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentAudio = null;
+        let currentBtn = null;
+        let offsets = { Indian: 0, Global: 0 };
+        let addedTrackIds = new Set();
+        // Perfectly blended trending terms for both hubs
+        const indianTerms = ['Top+Trending+Indian+Hits', 'Bollywood+2024+Pulse', 'Indian+Indie+Trending', 'Trending+Punjabi+Bass', 'Shashwat+Sachdev+Energy'];
+        const globalTerms = ['Global+Top+Anthems', 'Billboard+Hot+100', 'Viral+Mix+2024', 'Spotify+Global+Trending', 'Pop+High+Energy'];
+        let termIndexes = { Indian: 0, Global: 0 };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initParticles();
+            showSkeletons('indianGrid', 4);
+            showSkeletons('globalGrid', 4);
+            addedTrackIds.clear(); // Reset on refresh
+            
+            // Priority Fills - Leading with Dhurandhar and Mixed Global
+            loadMore('Indian', indianTerms[0], null, 'IN');
+            loadMore('Global', globalTerms[0], null, 'US');
+        });
+
+        function rotateLoadMode(category, btn) {
+            termIndexes[category] = (termIndexes[category] + 1) % (category === 'Indian' ? indianTerms.length : globalTerms.length);
+            const term = category === 'Indian' ? indianTerms[termIndexes[category]] : globalTerms[termIndexes[category]];
+            loadMore(category, term, btn);
+        }
+
+        function initParticles() {
+            const container = document.getElementById('particle-bg');
+            const icons = ['♪', '♫', '♬', '🎹', '✨'];
+            setInterval(() => {
+                const n = document.createElement('div');
+                n.className = 'music-note';
+                n.innerText = icons[Math.floor(Math.random() * icons.length)];
+                n.style.left = Math.random() * 100 + 'vw';
+                n.style.animationDuration = (8 + Math.random() * 4) + 's';
+                container.appendChild(n);
+                setTimeout(() => n.remove(), 12000);
+            }, 1800);
+        }
+
+        function showSkeletons(gridId, count) {
+            const grid = document.getElementById(gridId);
+            for (let i = 0; i < count; i++) {
+                const sk = document.createElement('div');
+                sk.className = 'm-card skeleton';
+                sk.innerHTML = `<div class="m-art-wrapper"></div><div class="m-info"><div class="m-track" style="width:60%; height:15px; background:rgba(255,255,255,0.05); border-radius:5px"></div></div>`;
+                grid.appendChild(sk);
+            }
+        }
+
+        async function loadMore(category, term, btn, forcedCountry) {
+            if (btn) btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            const gridId = category === 'Indian' ? 'indianGrid' : 'globalGrid';
+            const country = forcedCountry || (category === 'Global' ? 'US' : 'IN');
+            const grid = document.getElementById(gridId);
+            
+            try {
+                const limit = offsets[category] === 0 ? 12 : 8;
+                const response = await fetch(`https://itunes.apple.com/search?term=${term}&limit=${limit * 2}&offset=${offsets[category]}&media=music&entity=song&country=${country}`);
+                const data = await response.json();
+                
+                if (offsets[category] === 0) grid.innerHTML = '';
+                offsets[category] += limit;
+
+                // Shuffle results for maximum variation
+                const shuffled = (data.results || []).sort(() => Math.random() - 0.5);
+
+                shuffled.forEach((track, i) => {
+                    if (!track.previewUrl) return; 
+                    
+                    // Filter out Kabir Singh, Romantic, and REPEATS
+                    const id = track.trackId;
+                    if (addedTrackIds.has(id)) return;
+                    
+                    const title = (track.trackName || '').toLowerCase();
+                    const collection = (track.collectionName || '').toLowerCase();
+                    if (title.includes('kabir singh') || collection.includes('kabir singh') || 
+                        title.includes('romantic') || collection.includes('romantic')) return;
+
+                    addedTrackIds.add(id);
+                    const art = track.artworkUrl100.replace('100x100', '600x600');
+                    const div = document.createElement('div');
+                    div.className = 'm-card';
+                    div.innerHTML = `
+                        <div class="m-art-wrapper">
+                            <img src="${art}" class="m-art" loading="lazy">
+                            <div class="equalizer"><div class="eq-bar"></div><div class="eq-bar"></div><div class="eq-bar"></div></div>
+                            <div class="m-overlay">
+                                <div class="m-play-ring" data-src="${track.previewUrl}" data-track="${track.trackName}" data-artist="${track.artistName}" data-art="${art}" onclick="handlePlay(this)">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-info">
+                            <div class="m-track" title="${track.trackName}">${track.trackName}</div>
+                            <div class="m-artist" title="${track.artistName}">${track.artistName}</div>
+                        </div>
+                    `;
+                    grid.appendChild(div);
+                    setTimeout(() => div.classList.add('revealed'), i * 80);
+                });
+            } catch (e) { console.error(e); }
+            finally { if (btn) btn.innerHTML = 'LOAD MORE'; }
+        }
+
+        function handlePlay(btn) {
+            const src = btn.getAttribute('data-src');
+            const card = btn.closest('.m-card');
+
+            if (currentAudio && currentAudio.src === src) { togglePlayback(); return; }
+            if (currentAudio) {
+                currentAudio.pause();
+                currentBtn.classList.remove('playing');
+                currentBtn.querySelector('i').className = 'fas fa-play';
+                currentBtn.closest('.m-card').classList.remove('active-play');
+            }
+
+            currentAudio = new Audio(src);
+            currentBtn = btn;
+            document.getElementById('pArt').src = btn.getAttribute('data-art');
+            document.getElementById('pTrack').innerText = btn.getAttribute('data-track');
+            document.getElementById('pArtist').innerText = btn.getAttribute('data-artist');
+            document.getElementById('playerBar').classList.add('active');
+
+            currentAudio.play();
+            card.classList.add('active-play');
+            updateUI(true);
+
+            currentAudio.ontimeupdate = () => {
+                const pct = (currentAudio.currentTime / currentAudio.duration) * 100;
+                document.getElementById('pProgress').style.width = pct + '%';
+                const cur = Math.floor(currentAudio.currentTime);
+                document.getElementById('currentTime').innerText = `0:${cur < 10 ? '0' : ''}${cur}`;
+            };
+        }
+
+        function togglePlayback() {
+            if (!currentAudio) return;
+            if (currentAudio.paused) { currentAudio.play(); updateUI(true); currentBtn.closest('.m-card').classList.add('active-play'); }
+            else { currentAudio.pause(); updateUI(false); currentBtn.closest('.m-card').classList.remove('active-play'); }
+        }
+
+        function updateUI(play) {
+            currentBtn.querySelector('i').className = play ? 'fas fa-pause' : 'fas fa-play';
+            document.getElementById('pPlayIcon').className = play ? 'fas fa-pause' : 'fas fa-play';
+            if (play) currentBtn.classList.add('playing'); else currentBtn.classList.remove('playing');
+        }
+
+        function seek(e) {
+            if (!currentAudio) return;
+            const bar = e.currentTarget;
+            const rect = bar.getBoundingClientRect();
+            currentAudio.currentTime = ((e.clientX - rect.left) / rect.width) * currentAudio.duration;
+        }
+    </script>
+</body>
+</html>

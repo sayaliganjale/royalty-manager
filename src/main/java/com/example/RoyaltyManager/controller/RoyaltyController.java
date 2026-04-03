@@ -3,6 +3,7 @@ package com.example.RoyaltyManager.controller;
 import com.example.RoyaltyManager.model.*;
 import com.example.RoyaltyManager.service.RoyaltyService;
 import com.example.RoyaltyManager.repository.DisputeRepository; // Naya Import
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +21,9 @@ public class RoyaltyController {
     private DisputeRepository disputeRepo; // Dispute access karne ke liye
 
     @GetMapping("/dashboard")
-    public String dashboard(Model model) {
+    public String dashboard(HttpSession session, Model model) {
+        System.out.println("Accessing Dashboard - adminSession: " + session.getAttribute("adminSession"));
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         // Stats for cards
         model.addAttribute("totalArtists", royaltyService.getTotalArtistsCount());
         model.addAttribute("totalTracks", royaltyService.getTotalTracksCount());
@@ -30,9 +33,14 @@ public class RoyaltyController {
         
         // Table data (Transactions)
         model.addAttribute("transactions", royaltyService.getAllTransactions());
+        
+        // RESTORED: Artist Payout Data
+        model.addAttribute("artistPayouts", royaltyService.getArtistPayouts());
+
+        // Artist data (For the restored Payouts section)
+        model.addAttribute("artists", royaltyService.getAllArtists());
 
         // Dispute data (Noah Rhodes ki complaints)
-        // ISI LINE KI WAJAH SE ERROR AA RAHA THA
         model.addAttribute("disputes", disputeRepo.findAll()); 
         
         return "dashboard";
@@ -40,7 +48,9 @@ public class RoyaltyController {
 
     // NAYA METHOD: Dispute ko solve karne ke liye
     @PostMapping("/resolve-dispute/{id}")
-    public String resolveDispute(@PathVariable Long id) {
+    public String resolveDispute(@PathVariable Long id, HttpSession session) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
+        if (id == null) return "redirect:/dashboard";
         disputeRepo.findById(id).ifPresent(d -> {
             d.setStatus("RESOLVED");
             disputeRepo.save(d);
@@ -49,39 +59,45 @@ public class RoyaltyController {
     }
 
     @GetMapping("/add-artist")
-    public String showArtistForm(Model model) {
+    public String showArtistForm(HttpSession session, Model model) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         model.addAttribute("artist", new Artist());
         return "artist_form";
     }
 
     @PostMapping("/save-artist")
-    public String saveArtist(@ModelAttribute Artist artist) {
+    public String saveArtist(@ModelAttribute Artist artist, HttpSession session) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         royaltyService.saveArtist(artist);
         return "redirect:/dashboard";
     }
 
     @GetMapping("/label/track-registration")
-    public String showTrackForm(Model model) {
+    public String showTrackForm(HttpSession session, Model model) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         model.addAttribute("track", new Track());
         model.addAttribute("artists", royaltyService.getAllArtists());
         return "track_registration";
     }
 
     @PostMapping("/label/save-track")
-    public String saveTrack(@ModelAttribute Track track) {
+    public String saveTrack(@ModelAttribute Track track, HttpSession session) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         royaltyService.saveTrack(track);
         return "redirect:/dashboard";
     }
 
     @GetMapping("/label/contract-management")
-    public String showContractForm(Model model) {
+    public String showContractForm(HttpSession session, Model model) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         model.addAttribute("contract", new Contract());
         model.addAttribute("artists", royaltyService.getAllArtists());
         return "contract_form";
     }
 
     @GetMapping("/label/analytics")
-    public String showAnalytics(Model model) {
+    public String showAnalytics(HttpSession session, Model model) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         List<RoyaltyTransaction> transactions = royaltyService.getAllTransactions();
         double totalGross = royaltyService.getTotalRevenue(); 
         
@@ -98,7 +114,8 @@ public class RoyaltyController {
     }
 
     @PostMapping("/upload-csv")
-    public String uploadCSV(@RequestParam("file") MultipartFile file) {
+    public String uploadCSV(@RequestParam("file") MultipartFile file, HttpSession session) {
+        if (session.getAttribute("adminSession") == null) return "redirect:/admin/login";
         try {
             royaltyService.processCSV(file);
         } catch (Exception e) { 

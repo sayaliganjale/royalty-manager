@@ -13,6 +13,7 @@ public class Track {
     private String isrcCode; // Unique ID for songs
     private LocalDate releaseDate;
     private String genre;
+    private String previewUrl; // Audio sample URL (MP3)
 
     @ManyToOne
     @JoinColumn(name = "artist_id")
@@ -29,6 +30,8 @@ public class Track {
     public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
     public String getGenre() { return genre; }
     public void setGenre(String genre) { this.genre = genre; }
+    public String getPreviewUrl() { return previewUrl; }
+    public void setPreviewUrl(String previewUrl) { this.previewUrl = previewUrl; }
     public Artist getArtist() { return artist; }
     public void setArtist(Artist artist) { this.artist = artist; }
 }
