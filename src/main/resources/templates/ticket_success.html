@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Your Ticket | EliteStudio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --bg-deep:      #0a061a;
+            --aurora-1:     #3a1c71;
+            --aurora-2:     #d76d77;
+            --aurora-3:     #ffaf7b;
+            --accent-main:  #a855f7;
+            --accent-pink:  #ec4899;
+            --accent-cyan:  #06b6d4;
+            --accent-green: #10b981;
+            --glass-bg:     rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-ghost:   #e2e8f0;
+            --text-dim:     #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-ghost);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 40px 20px;
+        }
+
+        .aurora-container { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+        .aurora { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.2; animation: auroraMove 25s infinite alternate; }
+        .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
+        .aurora-2 { width: 70vw; height: 70vh; background: var(--aurora-2); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .aurora-3 { width: 50vw; height: 50vh; background: var(--aurora-3); top: 30%; right: 10%; animation-delay: -10s; }
+        @keyframes auroraMove {
+            0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+            100% { transform: translate(100px, 50px) rotate(30deg) scale(1.1); }
+        }
+
+        /* Confetti particles */
+        .confetti-container {
+            position: fixed; inset: 0; pointer-events: none; z-index: 5; overflow: hidden;
+        }
+        .confetti-piece {
+            position: absolute; width: 10px; height: 10px; border-radius: 2px;
+            animation: confettiFall linear forwards;
+        }
+        @keyframes confettiFall {
+            0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Success header */
+        .success-header {
+            position: relative; z-index: 10; text-align: center; margin-bottom: 45px;
+            animation: slideDown 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes slideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to   { transform: translateY(0);     opacity: 1; }
+        }
+
+        .success-icon {
+            width: 90px; height: 90px; border-radius: 50%; margin: 0 auto 25px;
+            background: linear-gradient(135deg, var(--accent-green), #059669);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; color: white;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.5);
+            animation: iconPop 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+        }
+        @keyframes iconPop {
+            from { transform: scale(0); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+
+        .success-title {
+            font-family: 'Nunito', sans-serif; font-size: 3rem; font-weight: 900;
+            letter-spacing: -1px; color: white; margin-bottom: 10px;
+        }
+        .success-title span {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-cyan));
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .success-sub { font-size: 1rem; color: var(--text-dim); font-weight: 600; }
+
+        /* Ticket Card */
+        .ticket-card {
+            position: relative; z-index: 10; width: 100%; max-width: 900px;
+            background: var(--glass-bg); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border); border-radius: 40px; overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
+            animation: ticketReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+        }
+        @media(min-width: 768px) { .ticket-card { flex-direction: row; } }
+        @keyframes ticketReveal {
+            from { transform: translateY(40px) scale(0.97); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        /* Dashed "tear" line */
+        .tear-line {
+            display: none;
+        }
+        @media(min-width: 768px) {
+            .tear-line {
+                display: block; width: 1px; border-left: 2px dashed rgba(255,255,255,0.1);
+                position: relative;
+            }
+            .tear-line::before, .tear-line::after {
+                content: ''; position: absolute; width: 30px; height: 30px;
+                background: var(--bg-deep); border-radius: 50%;
+                left: 50%; transform: translateX(-50%);
+            }
+            .tear-line::before { top: -15px; }
+            .tear-line::after  { bottom: -15px; }
+        }
+
+        /* Left section */
+        .ticket-info {
+            flex: 1; padding: 45px 40px;
+            display: flex; flex-direction: column; justify-content: space-between;
+        }
+
+        .ticket-label-tag {
+            display: inline-flex; align-items: center; gap: 10px; margin-bottom: 30px;
+            background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 7px 18px; border-radius: 30px;
+            font-size: 0.7rem; font-weight: 800; letter-spacing: 0.15em; text-transform: uppercase;
+            color: var(--accent-green);
+        }
+        .ticket-label-tag .dot {
+            width: 8px; height: 8px; background: var(--accent-green); border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.8); } }
+
+        .event-name {
+            font-family: 'Nunito', sans-serif; font-size: 2.2rem; font-weight: 900;
+            letter-spacing: -0.5px; color: white; line-height: 1.1; margin-bottom: 8px;
+        }
+        .event-artist { font-size: 0.9rem; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 35px; }
+
+        .ticket-meta-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        .meta-block { }
+        .meta-label {
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em;
+            color: var(--text-dim); margin-bottom: 5px;
+        }
+        .meta-value { font-size: 0.95rem; font-weight: 700; color: white; }
+
+        .ticket-total-row {
+            margin-top: 30px; padding-top: 25px;
+            border-top: 1px solid var(--glass-border);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .total-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); }
+        .total-value { font-family: 'Nunito', sans-serif; font-size: 2.5rem; font-weight: 900; color: white; }
+
+        /* Right QR section */
+        .ticket-qr-pane {
+            padding: 45px 40px;
+            background: rgba(255,255,255,0.02);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 20px; min-width: 240px;
+        }
+
+        .qr-wrapper {
+            width: 180px; height: 180px; border-radius: 20px; overflow: hidden;
+            border: 1px solid var(--glass-border); background: white;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 40px rgba(168, 85, 247, 0.3);
+        }
+        #qrcode img, #qrcode canvas { width: 160px !important; height: 160px !important; }
+
+        .qr-label {
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.2em;
+            color: var(--text-dim); text-align: center;
+        }
+
+        .ticket-id-chip {
+            font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900;
+            letter-spacing: 0.2em; color: var(--accent-main);
+            background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.2);
+            padding: 8px 20px; border-radius: 30px; text-align: center;
+        }
+
+        /* Actions */
+        .actions {
+            position: relative; z-index: 10; margin-top: 30px;
+            display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+            animation: ticketReveal 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
+        }
+        .btn-action {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 14px 28px; border-radius: 50px; font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+            text-decoration: none; cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink));
+            color: white; box-shadow: 0 10px 30px rgba(168,85,247,0.3);
+        }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(168,85,247,0.4); }
+        .btn-ghost {
+            background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-ghost);
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="aurora-container">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+    </div>
+
+    <div class="confetti-container" id="confettiContainer"></div>
+
+    <!-- Success Header -->
+    <div class="success-header">
+        <div class="success-icon"><i class="fas fa-check"></i></div>
+        <h1 class="success-title">You're <span>In!</span></h1>
+        <p class="success-sub">Your ticket has been confirmed. We've sent a receipt to your email.</p>
+    </div>
+
+    <!-- The Ticket -->
+    <div class="ticket-card">
+        <!-- Info Pane -->
+        <div class="ticket-info">
+            <div>
+                <div class="ticket-label-tag"><span class="dot"></span> TICKET CONFIRMED</div>
+                <div class="event-name" th:text="${event.name}">Event Name</div>
+                <div class="event-artist" th:text="${event.artist.name}">Artist Name</div>
+
+                <div class="ticket-meta-grid">
+                    <div class="meta-block">
+                        <div class="meta-label"><i class="fas fa-calendar"></i> Date</div>
+                        <div class="meta-value" th:text="${#temporals.format(event.eventDate, 'MMM dd, yyyy')}">Date</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label"><i class="fas fa-location-dot"></i> Venue</div>
+                        <div class="meta-value" th:text="${event.venue}">Venue</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label"><i class="fas fa-user"></i> Name</div>
+                        <div class="meta-value" th:text="${buyerName}">Buyer</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label"><i class="fas fa-ticket"></i> Tier</div>
+                        <div class="meta-value" th:text="${ticketType}">GA</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label"><i class="fas fa-hashtag"></i> Quantity</div>
+                        <div class="meta-value" th:text="${quantity} + ' Ticket(s)'">1 Ticket(s)</div>
+                    </div>
+                    <div class="meta-block">
+                        <div class="meta-label"><i class="fas fa-envelope"></i> Email</div>
+                        <div class="meta-value" th:text="${buyerEmail}" style="font-size:0.8rem;">buyer@email.com</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-total-row">
+                <span class="total-label">Total Paid</span>
+                <span class="total-value" th:text="${'$' + #numbers.formatDecimal(amount, 1, 2)}">$0.00</span>
+            </div>
+        </div>
+
+        <!-- Tear Line -->
+        <div class="tear-line"></div>
+
+        <!-- QR Pane -->
+        <div class="ticket-qr-pane">
+            <div class="qr-wrapper">
+                <div id="qrcode"></div>
+            </div>
+            <div class="qr-label">Scan at the Venue Gate</div>
+            <div class="ticket-id-chip" th:id="ticketIdDisplay"
+                 th:text="'#ES-' + ${#strings.substring(T(java.util.UUID).randomUUID().toString(), 0, 8).toUpperCase()}">
+                 #ES-XXXXXXXX
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="actions">
+        <a th:href="@{/events}" class="btn-action btn-ghost">
+            <i class="fas fa-calendar-star"></i> VIEW MORE EVENTS
+        </a>
+        <a th:href="@{/}" class="btn-action btn-primary">
+            <i class="fas fa-house"></i> BACK TO HOME
+        </a>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        // --- CONFETTI ---
+        const colors = ['#a855f7', '#ec4899', '#06b6d4', '#10b981', '#f59e0b', '#fff'];
+        const container = document.getElementById('confettiContainer');
+        for (let i = 0; i < 80; i++) {
+            const piece = document.createElement('div');
+            piece.className = 'confetti-piece';
+            piece.style.left = Math.random() * 100 + 'vw';
+            piece.style.width = (Math.random() * 8 + 6) + 'px';
+            piece.style.height = (Math.random() * 8 + 6) + 'px';
+            piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+            piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+            piece.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            piece.style.animationDelay = (Math.random() * 2) + 's';
+            piece.style.opacity = Math.random() * 0.8 + 0.2;
+            container.appendChild(piece);
+        }
+
+        // --- QR CODE GENERATION ---
+        const eventName  = /*[[${event.name}]]*/ 'Event';
+        const buyerName  = /*[[${buyerName}]]*/ 'Buyer';
+        const buyerEmail = /*[[${buyerEmail}]]*/ 'email';
+        const venue      = /*[[${event.venue}]]*/ 'Venue';
+        const ticketType = /*[[${ticketType}]]*/ 'GA';
+        const quantity   = /*[[${quantity}]]*/ 1;
+        const amount     = /*[[${amount}]]*/ 0;
+        const ticketId   = document.getElementById('ticketIdDisplay').innerText.trim();
+
+        const qrPayload = `ELITE STUDIO TICKET\n${ticketId}\nEvent: ${eventName}\nBuyer: ${buyerName}\nEmail: ${buyerEmail}\nVenue: ${venue}\nTier: ${ticketType} x${quantity}\nTotal: $${amount}`;
+
+        new QRCode(document.getElementById('qrcode'), {
+            text: qrPayload,
+            width: 160,
+            height: 160,
+            colorDark: '#1a0a2e',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>

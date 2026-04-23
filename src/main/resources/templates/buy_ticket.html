@@ -31,7 +31,8 @@
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
-            padding: 20px;
+            overflow-y: auto;
+            padding: 80px 20px 40px;
         }
 
         /* --- IMMERSIVE AURORA BACKGROUND --- */
@@ -39,7 +40,7 @@
             position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
         .aurora {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.3;
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.3;
             animation: auroraMove 25s infinite alternate;
         }
         .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
@@ -181,6 +182,45 @@
         
         /* Hide native radio */
         .tier-option input[type="radio"] { position: absolute; opacity: 0; }
+        .tier-option input[type="checkbox"] { position: absolute; opacity: 0; }
+
+        /* --- MINI CALENDAR --- */
+        .cal-widget {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+            border-radius: 20px; padding: 20px; margin-bottom: 25px;
+        }
+        .cal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .cal-month { font-weight: 800; font-size: 0.9rem; color: white; }
+        .cal-year  { font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700; }
+        .cal-grid {
+            display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center;
+        }
+        .cal-day-name { font-size: 0.6rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; padding: 4px 0; }
+        .cal-day {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 600; color: var(--text-dim); margin: 0 auto;
+        }
+        .cal-day.other-month { opacity: 0.25; }
+        .cal-day.today { background: rgba(255,255,255,0.08); color: white; }
+        .cal-day.event-day {
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink));
+            color: white; font-weight: 900;
+            box-shadow: 0 4px 15px rgba(168,85,247,0.5);
+            animation: calPulse 2s infinite;
+        }
+        @keyframes calPulse {
+            0%, 100% { box-shadow: 0 4px 15px rgba(168,85,247,0.5); }
+            50%       { box-shadow: 0 4px 25px rgba(168,85,247,0.9); }
+        }
+        .cal-event-label {
+            text-align: center; margin-top: 12px;
+            font-size: 0.7rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.15em; color: var(--accent-main);
+        }
     </style>
 </head>
 <body>
@@ -215,6 +255,12 @@
                         <div class="detail-value" th:text="${event.venue}">Venue</div>
                     </div>
                 </div>
+                
+                <div style="margin-top: 30px; width:100%; border-radius:18px; overflow:hidden; border:1px solid var(--glass-border);">
+                    <iframe width="100%" height="200" style="border:0;" loading="lazy" allowfullscreen 
+                        th:src="@{'https://maps.google.com/maps?q=' + ${event.venue} + '&t=&z=14&ie=UTF8&iwloc=&output=embed'}">
+                    </iframe>
+                </div>
             </div>
             
             <div class="price-block">
@@ -242,6 +288,9 @@
                     </div>
                 </div>
 
+                <!-- MINI CALENDAR -->
+                <div class="cal-widget" id="calWidget"></div>
+
                 <div class="mb25">
                     <label class="form-label">Select Tier</label>
                     <div class="tier-option">
@@ -256,6 +305,24 @@
                         <label class="tier-card" for="tier-vip">
                             <div><div class="tier-name">VIP Access</div><div class="tier-desc">Early entry + premium seats</div></div>
                             <div class="tier-mult">2.0× BASE</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb25">
+                    <label class="form-label"><i class="fas fa-bag-shopping" style="color:var(--accent-pink)"></i> Add Extras (Optional)</label>
+                    <div class="tier-option">
+                        <input type="checkbox" id="merch-poster" value="25.00" onchange="updateTotal()">
+                        <label class="tier-card" for="merch-poster" style="padding: 12px 20px;">
+                            <div><div class="tier-name" style="font-size:0.9rem">Signed Tour Poster</div><div class="tier-desc">Limited edition print</div></div>
+                            <div class="tier-mult" style="background:rgba(236, 72, 153, 0.2);color:var(--accent-pink)">+$25.00</div>
+                        </label>
+                    </div>
+                    <div class="tier-option">
+                        <input type="checkbox" id="merch-shirt" value="40.00" onchange="updateTotal()">
+                        <label class="tier-card" for="merch-shirt" style="padding: 12px 20px;">
+                            <div><div class="tier-name" style="font-size:0.9rem">Official Tour T-Shirt</div><div class="tier-desc">Premium cotton, select size at doors</div></div>
+                            <div class="tier-mult" style="background:rgba(236, 72, 153, 0.2);color:var(--accent-pink)">+$40.00</div>
                         </label>
                     </div>
                 </div>
@@ -310,12 +377,67 @@
             }
             return 1.0;
         }
+        function getMerchTotal() {
+            let merchCost = 0;
+            if (document.getElementById('merch-poster').checked) merchCost += 25.00;
+            if (document.getElementById('merch-shirt').checked) merchCost += 40.00;
+            return merchCost;
+        }
         function updateTotal() {
             const qty = parseInt(document.getElementById('ticketQty').value);
-            const total = (qty * unitPrice * getMultiplier()).toFixed(2);
-            document.getElementById('submitTotal').innerText = '$' + total;
-            document.getElementById('formAmount').value = total;
+            const total = (qty * unitPrice * getMultiplier()) + getMerchTotal();
+            document.getElementById('submitTotal').innerText = '$' + total.toFixed(2);
+            document.getElementById('formAmount').value = total.toFixed(2);
         }
+
+        // --- MINI CALENDAR ---
+        (function buildCalendar() {
+            const eventDateStr = /*[[${event.eventDate}]]*/ '2026-01-01';
+            const eventDate = new Date(eventDateStr + 'T00:00:00');
+            const today = new Date();
+            const year  = eventDate.getFullYear();
+            const month = eventDate.getMonth();
+            const eventDay = eventDate.getDate();
+
+            const monthNames = ['January','February','March','April','May','June',
+                                'July','August','September','October','November','December'];
+            const dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+
+            // First day of month and total days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrev  = new Date(year, month, 0).getDate();
+
+            let html = `
+                <div class="cal-header">
+                    <div>
+                        <div class="cal-month">${monthNames[month]}</div>
+                    </div>
+                    <div class="cal-year">${year}</div>
+                </div>
+                <div class="cal-grid">`;
+
+            dayNames.forEach(d => { html += `<div class="cal-day-name">${d}</div>`; });
+
+            // Prev month filler
+            for (let i = 0; i < firstDay; i++) {
+                html += `<div class="cal-day other-month">${daysInPrev - firstDay + i + 1}</div>`;
+            }
+
+            // Current month days
+            const isThisMonth = (today.getFullYear() === year && today.getMonth() === month);
+            for (let d = 1; d <= daysInMonth; d++) {
+                let cls = 'cal-day';
+                if (d === eventDay) cls += ' event-day';
+                else if (isThisMonth && d === today.getDate()) cls += ' today';
+                html += `<div class="${cls}">${d}</div>`;
+            }
+
+            html += `</div>
+                <div class="cal-event-label"><i class="fas fa-star"></i> Event Day Highlighted</div>`;
+
+            document.getElementById('calWidget').innerHTML = html;
+        })();
         /*]]>*/
     </script>
 </body>

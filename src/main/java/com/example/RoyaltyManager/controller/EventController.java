@@ -1,5 +1,6 @@
 package com.example.RoyaltyManager.controller;
 
+import com.example.RoyaltyManager.dto.EventDTO;
 import com.example.RoyaltyManager.model.Artist;
 import com.example.RoyaltyManager.model.Event;
 import com.example.RoyaltyManager.service.RoyaltyService;
@@ -19,10 +20,13 @@ public class EventController {
     @Autowired
     private RoyaltyService royaltyService;
 
+    @Autowired
+    private com.example.RoyaltyManager.service.RealEmailService emailService;
+
     // Public Pages
     @GetMapping("/events")
     public String publicEventsPage(Model model) {
-        model.addAttribute("events", royaltyService.getAllEvents());
+        model.addAttribute("events", royaltyService.getPublicEventDTOs());
         model.addAttribute("today", LocalDate.now());
         return "public_events";
     }
@@ -49,13 +53,42 @@ public class EventController {
             @RequestParam String buyerEmail,
             @RequestParam Integer quantity,
             @RequestParam String ticketType,
-            @RequestParam Double amount) {
+            @RequestParam Double amount,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         
         System.out.println("Processing ticket request for event: " + id + " | Buyer: " + buyerName);
         royaltyService.purchaseTicket(id, buyerName, buyerEmail, quantity, ticketType, amount);
         System.out.println("Purchase successful for: " + buyerEmail);
         
-        return "redirect:/events?success=true";
+        Event event = royaltyService.getEventById(id);
+        if (event != null) {
+            String subject = "Your EliteStudio Ticket for " + event.getName();
+            String body = "Dear " + buyerName + ",\n\n" +
+                          "Thank you for your purchase!\n" +
+                          "Event: " + event.getName() + " @ " + event.getVenue() + "\n" +
+                          "Tickets: " + quantity + "x " + ticketType + "\n\n" +
+                          "Get ready for an incredible experience!\nEliteStudio Support";
+            emailService.sendEmail(buyerEmail, subject, body);
+            
+            // Forward real time attributes to success page securely (no URL manipulation)
+            redirectAttributes.addFlashAttribute("event", event);
+            redirectAttributes.addFlashAttribute("buyerName", buyerName);
+            redirectAttributes.addFlashAttribute("buyerEmail", buyerEmail);
+            redirectAttributes.addFlashAttribute("quantity", quantity);
+            redirectAttributes.addFlashAttribute("ticketType", ticketType);
+            redirectAttributes.addFlashAttribute("amount", amount);
+        }
+        
+        return "redirect:/events/ticket-success";
+    }
+
+    @GetMapping("/events/ticket-success")
+    public String ticketSuccessPage(Model model) {
+        if (!model.containsAttribute("event")) {
+            // Un-authenticated or direct URL hit, boot them back
+            return "redirect:/events";
+        }
+        return "ticket_success";
     }
 
     // Admin Pages
@@ -89,6 +122,7 @@ public class EventController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate eventDate,
             @RequestParam String venue,
             @RequestParam Double ticketPrice,
+            @RequestParam(defaultValue = "500") Integer totalCapacity,
             @RequestParam Long artistId,
             HttpSession session) {
         
@@ -98,10 +132,56 @@ public class EventController {
         Artist selectedArtist = artists.stream().filter(a -> a.getId().equals(artistId)).findFirst().orElse(null);
         
         if (selectedArtist != null) {
-            Event event = new Event(name, eventDate, venue, ticketPrice, selectedArtist);
+            Event event = new Event(name, eventDate, venue, ticketPrice, totalCapacity, selectedArtist);
             royaltyService.saveEvent(event);
+            // Notify followers of this artist about the new event
+            List<com.example.RoyaltyManager.model.ArtistFollower> followers = royaltyService.getFollowersByArtist(selectedArtist.getId());
+            for (com.example.RoyaltyManager.model.ArtistFollower follower : followers) {
+                String subject = "New Event Alert: " + selectedArtist.getName() + " is coming to " + venue + "!";
+                String body = "Hey " + follower.getFollowerName() + ",\n\n" +
+                              "Great news! " + selectedArtist.getName() + " just announced a new event!\n" +
+                              "Event: " + name + "\nVenue: " + venue + "\nDate: " + eventDate + "\n\n" +
+                              "Be quick — get your tickets before they sell out!\nEliteStudio";
+                emailService.sendEmail(follower.getFollowerEmail(), subject, body);
+            }
         }
         
         return "redirect:/admin/events";
+    }
+
+    // --- FAN CLUB: FOLLOW AN ARTIST ---
+    @PostMapping("/events/follow")
+    public String followArtist(
+            @RequestParam Long artistId,
+            @RequestParam String followerName,
+            @RequestParam String followerEmail,
+            org.springframework.web.servlet.mvc.support.RedirectAttributes ra) {
+        
+        com.example.RoyaltyManager.model.Artist artist = royaltyService.getAllArtists().stream()
+                .filter(a -> a.getId().equals(artistId)).findFirst().orElse(null);
+        
+        if (artist != null) {
+            royaltyService.followArtist(artist, followerName, followerEmail);
+            ra.addFlashAttribute("followSuccess", "You are now following " + artist.getName() + "!");
+        }
+        return "redirect:/events";
+    }
+
+    // --- FAN REVIEWS ---
+    @PostMapping("/events/{id}/review")
+    public String submitReview(
+            @PathVariable Long id,
+            @RequestParam String reviewerName,
+            @RequestParam String reviewerEmail,
+            @RequestParam Integer rating,
+            @RequestParam String reviewText) {
+        
+        com.example.RoyaltyManager.model.Event event = royaltyService.getEventById(id);
+        if (event != null) {
+            com.example.RoyaltyManager.model.EventReview review =
+                    new com.example.RoyaltyManager.model.EventReview(event, reviewerName, reviewerEmail, rating, reviewText);
+            royaltyService.saveReview(review);
+        }
+        return "redirect:/events";
     }
 }

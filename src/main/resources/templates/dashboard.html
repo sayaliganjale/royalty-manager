@@ -28,7 +28,7 @@
             background-color: var(--bg-deep);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-ghost);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             overflow: hidden;
         }
@@ -38,7 +38,7 @@
             position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
         .aurora {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.2;
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.2;
             animation: auroraMove 25s infinite alternate;
         }
         .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
@@ -58,7 +58,7 @@
             border-right: 1px solid var(--glass-border);
             padding: 40px 20px; display: flex; flex-direction: column;
             position: relative; z-index: 50;
-        }
+         overflow-y: auto;}
 
         .logo-row { display: flex; align-items: center; gap: 15px; margin-bottom: 45px; padding: 0 10px; }
         .logo-icon {
@@ -173,7 +173,14 @@
         .dispute-reason { font-size: 0.85rem; color: var(--text-ghost); font-style: italic; margin-bottom: 15px; opacity: 0.8; }
         .btn-resolve { width: 100%; padding: 12px; background: var(--accent-main); color: white; border: none; border-radius: 14px; font-family: inherit; font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.3s; }
         .btn-resolve:hover { box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3); transform: translateY(-2px); }
-    </style>
+    
+        .scroll-v { max-height: 450px; overflow-y: auto; }
+        .scroll-v::-webkit-scrollbar { width: 5px; }
+        .scroll-v::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+</style>
 </head>
 <body>
     <div class="aurora-container">
@@ -188,7 +195,7 @@
             <div class="logo-text"><h1>EliteStudio</h1><p>Admin Control</p></div>
         </div>
         
-        <div class="nav-label">Management</div>
+                <div class="nav-label">Management</div>
         <a th:href="@{/dashboard}" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a>
         <a th:href="@{/add-artist}" class="nav-link"><i class="fas fa-users-gear"></i> Artists & Payouts</a>
         <a th:href="@{/label/track-registration}" class="nav-link"><i class="fas fa-compact-disc"></i> Track Registry</a>
@@ -198,10 +205,12 @@
         <div class="nav-label">Rule Engine</div>
         <a th:href="@{/admin/platforms}" class="nav-link"><i class="fas fa-tower-broadcast"></i> Platforms</a>
         <a th:href="@{/admin/royalty-rules}" class="nav-link"><i class="fas fa-sliders"></i> Royalty Rules</a>
+        <a th:href="@{/admin/region-rates}" class="nav-link"><i class="fas fa-globe"></i> Region Rates</a>
+        <a th:href="@{/admin/contract-types}" class="nav-link"><i class="fas fa-file-contract"></i> Contract Types</a>
         <a th:href="@{/admin/revenue-share}" class="nav-link"><i class="fas fa-handshake"></i> Revenue Share</a>
+        <a th:href="@{/admin/dispute-rules}" class="nav-link"><i class="fas fa-flag"></i> Dispute Rules</a>
         <a th:href="@{/admin/calc-engine}" class="nav-link"><i class="fas fa-calculator"></i> Calc Engine</a>
         <a th:href="@{/admin/audit-logs}" class="nav-link"><i class="fas fa-scroll"></i> Audit Logs</a>
-        
         <div style="margin-top:auto">
             <a th:href="@{/admin/logout}" class="nav-link" style="color:var(--accent-red)"><i class="fas fa-right-from-bracket"></i> Logout</a>
         </div>
@@ -213,10 +222,13 @@
                 <div class="live-chip"><span class="live-dot"></span> System Active</div>
                 <h2 class="page-title">Command <span>Center</span></h2>
             </div>
-            <form th:action="@{/upload-csv}" method="post" enctype="multipart/form-data" class="csv-upload">
-                <input type="file" name="file" class="csv-input" required>
-                <button type="submit" class="csv-btn"><i class="fas fa-upload"></i></button>
-            </form>
+            <div style="display:flex; gap:15px; align-items:center;">
+                <button id="simulate-btn" onclick="simulateTraffic()" class="csv-btn" style="width: auto; padding: 0 20px; font-weight:800; border-radius:20px; font-size:0.8rem; background: linear-gradient(135deg, var(--accent-orange), var(--accent-red));"><i class="fas fa-bolt"></i> Simulate Traffic</button>
+                <form th:action="@{/upload-csv}" method="post" enctype="multipart/form-data" class="csv-upload">
+                    <input type="file" name="file" class="csv-input" required>
+                    <button type="submit" class="csv-btn"><i class="fas fa-upload"></i></button>
+                </form>
+            </div>
         </div>
 
         <!-- STATS -->
@@ -224,25 +236,25 @@
             <div class="stat-card">
                 <div class="stat-icon" style="color:var(--accent-main)"><i class="fas fa-coins"></i></div>
                 <div class="stat-label">Gross Revenue</div>
-                <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(totalRevenue, 1, 2)}">$0.00</div>
-                <div class="stat-trend"><i class="fas fa-arrow-trend-up"></i> +12.4% this cycle</div>
+                <div class="stat-value" id="stat-gross-rev" th:text="${'$' + #numbers.formatDecimal(totalRevenue, 1, 2)}">$0.00</div>
+                <div class="stat-trend"><i class="fas fa-arrow-trend-up"></i> Live Tracking</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon" style="color:var(--accent-cyan)"><i class="fas fa-ticket"></i></div>
                 <div class="stat-label">Ticket Revenue</div>
-                <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(totalEventRevenue != null ? totalEventRevenue : 0.0, 1, 2)}">$0.00</div>
-                <div class="stat-trend">All payments cleared</div>
+                <div class="stat-value" id="stat-ticket-rev" th:text="${'$' + #numbers.formatDecimal(totalEventRevenue != null ? totalEventRevenue : 0.0, 1, 2)}">$0.00</div>
+                <div class="stat-trend">Live Tracking</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon" style="color:var(--accent-pink)"><i class="fas fa-building"></i></div>
                 <div class="stat-label">System Share (30%)</div>
-                <div class="stat-value" th:text="${'$' + #numbers.formatDecimal((totalRevenue + (totalEventRevenue != null ? totalEventRevenue : 0.0)) * 0.30, 1, 2)}">$0.00</div>
-                <div class="stat-trend">After artist payouts</div>
+                <div class="stat-value" id="stat-system-share" th:text="${'$' + #numbers.formatDecimal((totalRevenue + (totalEventRevenue != null ? totalEventRevenue : 0.0)) * 0.30, 1, 2)}">$0.00</div>
+                <div class="stat-trend">Live Tracking</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon" style="color:var(--accent-red)"><i class="fas fa-triangle-exclamation"></i></div>
                 <div class="stat-label">Open Disputes</div>
-                <div class="stat-value" style="color:var(--accent-red)" th:text="${disputes.size()}">0</div>
+                <div class="stat-value" id="stat-disputes" style="color:var(--accent-red)" th:text="${disputes.size()}">0</div>
                 <div class="stat-trend" style="color:var(--accent-red)">Requires Attention</div>
             </div>
         </div>
@@ -254,7 +266,7 @@
                     <div class="panel-title"><i class="fas fa-broadcast-tower" style="color:var(--accent-main)"></i> Live Stream Feed</div>
                     <span class="panel-badge bp">Real-time</span>
                 </div>
-                <div style="max-height: 480px; overflow-y: auto;">
+                <div class="scroll-v">
                     <table>
                         <thead>
                             <tr><th>Artist</th><th>Track</th><th>Platform</th><th style="text-align:right">Revenue</th></tr>
@@ -280,7 +292,7 @@
                     <div class="panel-title"><i class="fas fa-flag" style="color:var(--accent-red)"></i> Disputes</div>
                     <span class="panel-badge br" th:text="${disputes.size() + ' Active'}">0 Active</span>
                 </div>
-                <div style="max-height: 480px; overflow-y: auto;">
+                <div class="scroll-v">
                     <div th:each="d : ${disputes}" class="dispute-item">
                         <div class="dispute-status" th:classappend="${d.status == 'PENDING' ? 'status-pending' : 'status-resolved'}" th:text="${d.status}">Status</div>
                         <div class="dispute-artist" th:text="${d.artist.name}">Artist</div>
@@ -300,7 +312,7 @@
                 <div class="panel-title"><i class="fas fa-users-gear" style="color:var(--accent-pink)"></i> managed Portfolio</div>
                 <span class="panel-badge bm">Artists</span>
             </div>
-            <div style="max-height: 400px; overflow-y: auto;">
+            <div class="scroll-v">
                 <table>
                     <thead>
                         <tr><th>Artist Name</th><th>Catalog</th><th>Gross Revenue</th><th>Artist Net</th><th style="text-align:right">Action</th></tr>
@@ -318,5 +330,37 @@
             </div>
         </div>
     </main>
+
+    <script>
+        function updateStats() {
+            fetch('/api/admin/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('stat-gross-rev').innerText = '$' + parseFloat(data.totalRevenue).toFixed(2);
+                document.getElementById('stat-ticket-rev').innerText = '$' + parseFloat(data.totalEventRevenue).toFixed(2);
+                document.getElementById('stat-system-share').innerText = '$' + parseFloat(data.systemShare).toFixed(2);
+                document.getElementById('stat-disputes').innerText = data.totalDisputes;
+            })
+            .catch(console.error);
+        }
+
+        function simulateTraffic() {
+            const btn = document.getElementById('simulate-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Simulating...';
+            btn.disabled = true;
+            fetch('/api/admin/simulate', { method: 'POST' })
+            .then(response => {
+                updateStats();
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-bolt"></i> Simulate Traffic';
+                    btn.disabled = false;
+                    location.reload(); // Reload to show new table entries
+                }, 800);
+            })
+            .catch(console.error);
+        }
+
+        setInterval(updateStats, 3000);
+    </script>
 </body>
 </html>

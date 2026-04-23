@@ -1,5 +1,6 @@
 package com.example.RoyaltyManager.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,9 +21,15 @@ public class Event {
 
     @Column(nullable = false)
     private String venue;
+    
+    @Transient
+    private Integer calculatedTicketsSold; // Transient field for performance pre-calculation
 
     @Column(nullable = false)
     private Double ticketPrice;
+
+    @Column(nullable = false)
+    private Integer totalCapacity = 500; // Default 500 seats
 
     // Many events can feature one primary artist
     @ManyToOne
@@ -30,7 +37,12 @@ public class Event {
     private Artist artist;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<TicketPurchase> ticketPurchases;
+
+    @OneToMany(mappedBy = "event")
+    @JsonIgnore
+    private List<EventReview> reviews;
 
     public Event() {}
 
@@ -39,6 +51,16 @@ public class Event {
         this.eventDate = eventDate;
         this.venue = venue;
         this.ticketPrice = ticketPrice;
+        this.artist = artist;
+        this.totalCapacity = 500;
+    }
+
+    public Event(String name, LocalDate eventDate, String venue, Double ticketPrice, Integer totalCapacity, Artist artist) {
+        this.name = name;
+        this.eventDate = eventDate;
+        this.venue = venue;
+        this.ticketPrice = ticketPrice;
+        this.totalCapacity = totalCapacity;
         this.artist = artist;
     }
 
@@ -82,12 +104,30 @@ public class Event {
         this.ticketPrice = ticketPrice;
     }
 
-    public Artist getArtist() {
-        return artist;
+    public Artist getArtist() { return artist; }
+    public void setArtist(Artist artist) { this.artist = artist; }
+
+    public Integer getTotalCapacity() { return totalCapacity; }
+    public void setTotalCapacity(Integer totalCapacity) { this.totalCapacity = totalCapacity; }
+
+    public int getTicketsSold() {
+        if (calculatedTicketsSold != null) return calculatedTicketsSold;
+        if (ticketPurchases == null) return 0;
+        return ticketPurchases.stream().mapToInt(tp -> tp.getQuantity() != null ? tp.getQuantity() : 0).sum();
+    }
+    
+    public void setCalculatedTicketsSold(Integer calculatedTicketsSold) {
+        this.calculatedTicketsSold = calculatedTicketsSold;
     }
 
-    public void setArtist(Artist artist) {
-        this.artist = artist;
+    public boolean isSoldOut() {
+        return getTicketsSold() >= (totalCapacity != null ? totalCapacity : 500);
+    }
+
+    public int getAvailableSeats() {
+        int sold = getTicketsSold();
+        int cap = totalCapacity != null ? totalCapacity : 500;
+        return Math.max(0, cap - sold);
     }
 
     public List<TicketPurchase> getTicketPurchases() {
@@ -96,5 +136,18 @@ public class Event {
 
     public void setTicketPurchases(List<TicketPurchase> ticketPurchases) {
         this.ticketPurchases = ticketPurchases;
+    }
+
+    public List<EventReview> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<EventReview> reviews) {
+        this.reviews = reviews;
+    }
+
+    public EventReview getPastReview() {
+        if (reviews == null || reviews.isEmpty()) return null;
+        return reviews.get(0);
     }
 }

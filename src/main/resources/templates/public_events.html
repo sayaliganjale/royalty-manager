@@ -26,7 +26,7 @@
             background-color: var(--bg-deep);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-ghost);
-            min-height: 100vh;
+            height: 100vh;
             overflow-x: hidden;
         }
 
@@ -35,7 +35,7 @@
             position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
         .aurora {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.4;
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.4;
             animation: auroraMove 25s infinite alternate;
         }
         .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
@@ -169,6 +169,86 @@
         .btn-portal:hover { transform: scale(1.08) translateY(-5px); box-shadow: 0 20px 60px rgba(255,255,255,0.4); background: var(--accent-main); color: white; }
 
         footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; border-top: 1px solid var(--glass-border); position: relative; z-index: 1; }
+    
+        .scroll-v { max-height: 450px; overflow-y: auto; }
+        .scroll-v::-webkit-scrollbar { width: 5px; }
+        .scroll-v::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        /* --- CAPACITY BAR --- */
+        .cap-bar-wrap { margin: 0 30px 20px; }
+        .cap-label { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .cap-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 10px; overflow: hidden; }
+        .cap-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+        .cap-ok   { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-main)); }
+        .cap-warn { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+
+        /* --- SOLD OUT badge --- */
+        .sold-out-badge {
+            display: inline-block; background: rgba(239,68,68,0.15);
+            border: 1px solid rgba(239,68,68,0.4); color: #ef4444;
+            font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em;
+            padding: 4px 12px; border-radius: 20px; margin-bottom: 6px;
+        }
+
+        /* --- CARD ACTION ROW --- */
+        .card-actions { display: flex; gap: 8px; padding: 0 30px 20px; flex-wrap: wrap; }
+        .btn-share { display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px; border-radius: 30px; font-size: 0.7rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.1em; cursor: pointer;
+            border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); color: var(--text-dim);
+            text-decoration: none; transition: all 0.2s;
+        }
+        .btn-share:hover { background: rgba(255,255,255,0.08); color: white; border-color: rgba(255,255,255,0.2); }
+        .btn-share.wa:hover { border-color: #25d366; color: #25d366; }
+        .btn-share.tw:hover { border-color: #1d9bf0; color: #1d9bf0; }
+        .btn-follow:hover  { border-color: var(--accent-pink); color: var(--accent-pink); }
+
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: #110a25; border: 1px solid var(--glass-border); border-radius: 30px;
+            padding: 40px; width: 100%; max-width: 440px;
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-title { font-family: 'Nunito', sans-serif; font-size: 1.5rem; font-weight: 900; color: white; margin-bottom: 6px; }
+        .modal-sub   { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 25px; }
+        .m-label { display: block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 6px; }
+        .m-input {
+            width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border); border-radius: 14px;
+            color: white; font-family: inherit; font-size: 0.9rem; outline: none;
+            margin-bottom: 16px;
+        }
+        .m-input:focus { border-color: var(--accent-pink); }
+        .btn-modal-submit {
+            width: 100%; padding: 14px; background: linear-gradient(135deg, var(--accent-pink), var(--accent-main));
+            border: none; border-radius: 16px; color: white; font-family: 'Nunito', sans-serif;
+            font-size: 1rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .btn-modal-submit:hover { transform: translateY(-2px); }
+        .btn-modal-cancel { width: 100%; text-align: center; margin-top: 12px; color: var(--text-dim); font-size: 0.8rem; cursor: pointer; }
+        .btn-modal-cancel:hover { color: white; }
+
+        /* --- STAR RATING --- */
+        .stars-input { display: flex; gap: 6px; flex-direction: row-reverse; justify-content: flex-end; margin-bottom: 16px; }
+        .stars-input input { display: none; }
+        .stars-input label { font-size: 1.5rem; cursor: pointer; color: rgba(255,255,255,0.2); transition: color 0.2s; }
+        .stars-input label:hover,
+        .stars-input label:hover ~ label,
+        .stars-input input:checked ~ label { color: #f59e0b; }
+
+        /* --- SUCCESS FLASH --- */
+        .flash-success {
+            max-width: 600px; margin: 0 auto 30px; background: rgba(16,185,129,0.1);
+            border: 1px solid rgba(16,185,129,0.3); border-radius: 20px; padding: 16px 24px;
+            text-align: center; color: #10b981; font-weight: 800; font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -199,7 +279,12 @@
             <p>Access the world's most exclusive live performances. Every ticket is a direct contribution to your favorite artists' creative journey.</p>
         </section>
 
-        <!-- Dynamic Success Alert -->
+        <!-- Follow Success Flash -->
+        <div th:if="${followSuccess}" class="flash-success" style="margin: 0 60px 30px;">
+            <i class="fas fa-heart"></i> <span th:text="${followSuccess}">Following!</span>
+        </div>
+
+        <!-- Booking Success -->
         <div th:if="${param.success}" class="portal-cta" style="margin-bottom: 40px;">
             <div class="cta-glass" style="padding: 30px; border-color: var(--accent-cyan);">
                 <h3 style="color: var(--accent-cyan); font-weight: 900; font-size: 1.5rem;">BOOKING SUCCESSFUL</h3>
@@ -208,54 +293,99 @@
         </div>
 
         <div class="events-grid">
-            <th:block th:each="event, iterStat : ${events}">
+        <th:block th:each="event, iterStat : ${events}">
                 
                 <!-- ACTIVE EVENT -->
-                <a th:if="${!event.eventDate.isBefore(today)}"
-                   th:href="@{'/events/' + ${event.id} + '/buy'}"
-                   class="event-card"
-                   th:style="'animation-delay: ' + (${iterStat.index} * 150) + 'ms'">
+                <div th:if="${event.eventDate != null && !event.eventDate.isBefore(today)}" class="event-card"
+                     th:style="'animation-delay: ' + (${iterStat.index} * 150) + 'ms'">
                    
                     <div class="card-header">
-                        <span class="artist-label" th:text="${event.artist.name}">Artist</span>
+                        <span class="artist-label" th:text="${event.artistName != null ? event.artistName : 'Unknown Artist'}">Artist</span>
                         <div class="event-name" th:text="${event.name}">Event Name</div>
                     </div>
                     
                     <div class="card-body">
                         <div class="card-meta">
-                            <div class="date-box">
+                            <div class="date-box" th:if="${event.eventDate != null}">
                                 <span class="day" th:text="${#temporals.format(event.eventDate, 'dd')}">01</span>
                                 <span class="month" th:text="${#temporals.format(event.eventDate, 'MMM')}">JAN</span>
                             </div>
+                            <div class="date-box" th:if="${event.eventDate == null}">
+                                <span class="day">--</span>
+                                <span class="month">ANY</span>
+                            </div>
                             <div class="meta-txt">
-                                <div class="m-date" th:text="${#temporals.format(event.eventDate, 'MMMM yyyy')}">January 2026</div>
+                                <div class="m-date" th:text="${event.eventDate != null ? #temporals.format(event.eventDate, 'MMMM yyyy') : 'Date TBA'}">January 2026</div>
                                 <div class="m-venue"><i class="fas fa-location-dot"></i> <span th:text="${event.venue}">Venue</span></div>
+                                <div class="event-countdown" th:if="${event.eventDate != null}" style="font-size:0.75rem; color:var(--accent-cyan); font-weight:800; margin-top:5px;" th:data-date="${event.eventDate}">
+                                   <i class="fas fa-circle-notch fa-spin"></i> SYNCING...
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CAPACITY BAR -->
+                        <div class="cap-bar-wrap" th:with="pct=${(event.totalCapacity > 0) ? (event.ticketsSold * 100 / event.totalCapacity) : 0}">
+                            <div class="cap-label">
+                                <span th:if="${event.soldOut}" class="sold-out-badge"><i class="fas fa-ban"></i> SOLD OUT</span>
+                                <span th:if="${!event.soldOut}" class="seats-left" th:text="${event.availableSeats} + ' left'">500 left</span>
+                                <span th:text="${pct} + '%'" th:style="${pct >= 80 ? 'color:#ef4444' : 'color:var(--accent-cyan)'}">0%</span>
+                            </div>
+                            <div class="cap-bar">
+                                <div class="cap-fill" th:classappend="${pct >= 80 ? 'cap-critical' : 'cap-ok'}" th:style="'width:' + ${pct} + '%'"></div>
                             </div>
                         </div>
 
                         <div class="card-footer">
                             <div>
                                 <div class="p-label">Access Pass</div>
-                                <div class="p-val" th:text="${'$' + #numbers.formatDecimal(event.ticketPrice, 1, 2)}">$0.00</div>
+                                <div class="p-val" th:text="${'$' + #numbers.formatDecimal(event.ticketPrice != null ? event.ticketPrice : 0, 1, 2)}">$0.00</div>
                             </div>
-                            <div class="btn-buy"><i class="fas fa-bolt"></i></div>
+                            <a th:if="${!event.soldOut}" th:href="@{'/events/' + ${event.id} + '/buy'}" class="btn-buy"><i class="fas fa-bolt"></i></a>
+                            <div th:if="${event.soldOut}" class="btn-buy" style="background:rgba(239,68,68,0.3); cursor:not-allowed;"><i class="fas fa-ban"></i></div>
                         </div>
                     </div>
-                    <div class="card-band" th:classappend="${iterStat.index % 3 == 0 ? 'band-purple' : (iterStat.index % 3 == 1 ? 'band-pink' : 'band-cyan')}"></div>
-                </a>
 
-                <!-- PAST EVENT -->
-                <div th:if="${event.eventDate.isBefore(today)}" class="event-card" style="opacity: 0.4; pointer-events: none;">
+                    <!-- SHARE + FOLLOW ROW -->
+                    <div class="card-actions">
+                        <a th:href="@{'https://wa.me/?text=Check out this event: ' + ${event.name} + ' @ ' + ${event.venue} + '! Get tickets at EliteStudio.'}" 
+                           target="_blank" class="btn-share wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <a th:href="@{'https://twitter.com/intent/tweet?text=Just+booked+tickets+to+' + ${#uris.escapePath(event.name)} + '+%40+' + ${#uris.escapePath(event.venue)} + '+via+%23EliteStudio+%F0%9F%8E%B6'}" 
+                           target="_blank" class="btn-share tw"><i class="fab fa-x-twitter"></i> Share</a>
+                        <button class="btn-share btn-follow" style="border:none;" 
+                                th:data-id="${event.artistId}" 
+                                th:data-name="${event.artistName}"
+                                onclick="openFollowModal(this.getAttribute('data-id'), this.getAttribute('data-name'))">
+                            <i class="fas fa-heart"></i> Follow Artist
+                        </button>
+                    </div>
+                    <div class="card-band" th:classappend="${iterStat.index % 3 == 0 ? 'band-purple' : (iterStat.index % 3 == 1 ? 'band-pink' : 'band-cyan')}"></div>
+                </div>
+
+
+                <!-- PAST EVENT (with review) -->
+                <div th:if="${event.eventDate != null && event.eventDate.isBefore(today)}" class="event-card" style="opacity: 0.6;">
                     <div class="card-header">
-                        <span class="artist-label" th:text="${event.artist.name}">Artist</span>
+                        <span class="artist-label" th:text="${event.artistName}">Artist</span>
                         <div class="event-name" th:text="${event.name}">Concluded</div>
                     </div>
                     <div class="card-body">
-                        <div class="card-meta" style="filter: grayscale(1);">
-                            <div class="date-box" style="background: #333;"><span class="day" style="color: #666;">-</span></div>
-                            <div class="meta-txt"><div class="m-date">Event Concluded</div></div>
+                        <div class="card-meta" style="filter: grayscale(0.6);">
+                            <div class="date-box" style="background: #222;"><span class="day" style="color: #555;">✓</span></div>
+                            <div class="meta-txt"><div class="m-date" style="color:var(--text-dim);">Event Concluded</div>
+                                <div class="m-venue"><i class="fas fa-location-dot"></i> <span th:text="${event.venue}">Venue</span></div>
+                            </div>
+                        </div>
+                        <!-- Leave a Review -->
+                        <div style="padding: 0 0 15px;" th:if="${!event.hasReview}">
+                            <button class="btn-share" style="border:1px solid rgba(168,85,247,0.3); color:var(--accent-main);"
+                                    th:data-id="${event.id}"
+                                    th:data-name="${event.name}"
+                                    onclick="openReviewModal(this.getAttribute('data-id'), this.getAttribute('data-name'))">
+                                <i class="fas fa-star"></i> Leave a Review
+                            </button>
                         </div>
                     </div>
+                    <div class="card-band" style="background: rgba(255,255,255,0.05);"></div>
                 </div>
 
             </th:block>
@@ -272,7 +402,95 @@
         </section>
     </main>
 
+    <!-- FOLLOW ARTIST MODAL -->
+    <div class="modal-overlay" id="followModal">
+        <div class="modal-box">
+            <div class="modal-title">Follow Artist 💜</div>
+            <div class="modal-sub" id="followModalSub">Get notified when new events are announced!</div>
+            <form action="/events/follow" method="post">
+                <input type="hidden" name="artistId" id="followArtistId">
+                <label class="m-label">Your Name</label>
+                <input type="text" name="followerName" class="m-input" placeholder="Jane Smith" required>
+                <label class="m-label">Your Email</label>
+                <input type="email" name="followerEmail" class="m-input" placeholder="jane@example.com" required>
+                <button type="submit" class="btn-modal-submit">SUBSCRIBE <i class="fas fa-heart"></i></button>
+                <div class="btn-modal-cancel" onclick="closeModal('followModal')">Cancel</div>
+            </form>
+        </div>
+    </div>
+
+    <!-- REVIEW MODAL -->
+    <div class="modal-overlay" id="reviewModal">
+        <div class="modal-box">
+            <div class="modal-title">Rate this Event ⭐</div>
+            <div class="modal-sub" id="reviewModalSub">Share your experience with other fans</div>
+            <form id="reviewForm" method="post">
+                <label class="m-label">Your Name</label>
+                <input type="text" name="reviewerName" class="m-input" placeholder="Jane Smith" required>
+                <label class="m-label">Your Email</label>
+                <input type="email" name="reviewerEmail" class="m-input" placeholder="jane@example.com" required>
+                <label class="m-label">Rating</label>
+                <div class="stars-input">
+                    <input type="radio" name="rating" id="r5" value="5"><label for="r5">★</label>
+                    <input type="radio" name="rating" id="r4" value="4"><label for="r4">★</label>
+                    <input type="radio" name="rating" id="r3" value="3" checked><label for="r3">★</label>
+                    <input type="radio" name="rating" id="r2" value="2"><label for="r2">★</label>
+                    <input type="radio" name="rating" id="r1" value="1"><label for="r1">★</label>
+                </div>
+                <label class="m-label">Your Review</label>
+                <textarea name="reviewText" class="m-input" rows="3" placeholder="Amazing show! The energy was incredible..." required></textarea>
+                <button type="submit" class="btn-modal-submit">SUBMIT REVIEW <i class="fas fa-star"></i></button>
+                <div class="btn-modal-cancel" onclick="closeModal('reviewModal')">Cancel</div>
+            </form>
+        </div>
+    </div>
+
     <footer>ELITE STUDIO &bull; POWERED BY LIVE STUDIO &copy; 2026</footer>
 
+    <script>
+        function updateCountdowns() {
+            const elements = document.querySelectorAll('.event-countdown');
+            const now = new Date().getTime();
+            
+            elements.forEach(el => {
+                const targetDateStr = el.getAttribute('data-date');
+                if (!targetDateStr) return;
+                // Add timezone neutral time
+                const target = new Date(targetDateStr + "T00:00:00").getTime();
+                const diff = target - now;
+                
+                if (diff < 0) {
+                    el.innerHTML = '<i class="fas fa-satellite-dish"></i> EVENT LIVE / CONCLUDED';
+                    el.style.color = 'var(--accent-pink)';
+                } else {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    const secs = Math.floor((diff % (1000 * 60)) / 1000);
+                    el.innerHTML = `<i class="fas fa-clock"></i> SECURE TICKETS: ${days}d ${hours}h ${mins}m ${secs}s`;
+                }
+            });
+        }
+        setInterval(updateCountdowns, 1000);
+        updateCountdowns();
+
+        function openFollowModal(artistId, artistName) {
+            document.getElementById('followArtistId').value = artistId;
+            document.getElementById('followModalSub').innerText = 'Get notified when ' + artistName + ' announces new events!';
+            document.getElementById('followModal').classList.add('active');
+        }
+        function openReviewModal(eventId, eventName) {
+            document.getElementById('reviewForm').action = '/events/' + eventId + '/review';
+            document.getElementById('reviewModalSub').innerText = 'Share your experience at ' + eventName;
+            document.getElementById('reviewModal').classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        // Close modal on overlay click
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active'); });
+        });
+    </script>
 </body>
 </html>

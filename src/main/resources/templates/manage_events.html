@@ -26,7 +26,7 @@
             background-color: var(--bg-deep);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-ghost);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             overflow: hidden;
         }
@@ -36,7 +36,7 @@
             position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
         .aurora {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.2;
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.2;
             animation: auroraMove 25s infinite alternate;
         }
         .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
@@ -56,7 +56,7 @@
             border-right: 1px solid var(--glass-border);
             padding: 40px 20px; display: flex; flex-direction: column;
             position: relative; z-index: 50;
-        }
+         overflow-y: auto;}
 
         .logo-row { display: flex; align-items: center; gap: 15px; margin-bottom: 45px; padding: 0 10px; }
         .logo-icon {
@@ -173,7 +173,43 @@
         .scroll-v { max-height: 450px; overflow-y: auto; }
         .scroll-v::-webkit-scrollbar { width: 5px; }
         .scroll-v::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-    </style>
+    
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .g-tags{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+        .g-tag{padding:7px 18px;border-radius:30px;border:1px solid var(--glass-border);color:var(--text-dim);font-size:0.75rem;font-weight:700;cursor:pointer;transition:all 0.3s;}
+        .g-tag.on,.g-tag:hover{color:white;border-color:var(--accent-main);background:rgba(168,85,247,0.15);}
+        .h-wall{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;margin-bottom:30px;scrollbar-width:thin;}
+        .h-card{flex-shrink:0;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:20px;padding:18px;text-align:center;cursor:pointer;transition:all 0.3s;min-width:110px;}
+        .h-card:hover{border-color:var(--accent-main);transform:translateY(-5px);box-shadow:0 15px 40px rgba(168,85,247,0.15);}
+        .h-av{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:1.2rem;font-weight:900;color:white;margin:0 auto 10px;}
+        .h-nm{font-size:0.78rem;font-weight:700;color:white;}.h-dt{font-size:0.63rem;color:var(--text-dim);margin-top:3px;}
+        .hyp{height:3px;border-radius:3px;background:rgba(255,255,255,0.08);overflow:hidden;margin-top:8px;}
+        .tl{display:flex;align-items:center;gap:2px;margin-top:6px;font-size:0.58rem;font-weight:700;}
+        .tl span{color:var(--text-dim);white-space:nowrap;}.tl span.done{color:var(--accent-cyan);}.tl span.cur{color:white;}.tl hr{flex:1;border:none;border-top:1px solid rgba(255,255,255,0.08);margin:0 2px;}
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:25px;margin-bottom:25px;}
+        @media(max-width:900px){.two-col{grid-template-columns:1fr;}}
+        .lb-row{display:flex;align-items:center;gap:14px;padding:15px 28px;border-bottom:1px solid var(--glass-border);}
+        .lb-row:last-child{border-bottom:none;}
+        .rnk{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.82rem;flex-shrink:0;}
+        .r1{background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;}.r2{background:linear-gradient(135deg,#c0c0c0,#808080);color:#000;}.r3{background:linear-gradient(135deg,#cd7f32,#8b4513);color:white;}.rX{background:rgba(255,255,255,0.05);color:var(--text-dim);}
+        .lb-bg{flex:1;height:5px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden;}.lb-fg{height:100%;background:linear-gradient(90deg,var(--accent-main),var(--accent-pink));border-radius:5px;}
+        .bnr-prev{background:linear-gradient(135deg,#1a0a2e,#2a1550);border:1px solid rgba(168,85,247,0.35);border-radius:16px;padding:22px;text-align:center;margin-top:14px;}
+        .bnr-t{font-family:'Nunito',sans-serif;font-size:1.3rem;font-weight:900;color:white;min-height:1.5em;}.bnr-m{font-size:0.78rem;color:var(--accent-cyan);margin-top:5px;min-height:1em;}
+        .rem-row{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:rgba(255,255,255,0.03);border:1px solid var(--glass-border);border-radius:12px;margin-bottom:8px;}
+        .btn-inspire{width:100%;padding:12px;background:rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.25);color:var(--accent-cyan);border-radius:14px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all 0.3s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;}
+        .btn-inspire:hover{background:rgba(6,182,212,0.2);transform:translateY(-2px);}
+        .sc-modal{display:none;position:fixed;inset:0;z-index:300;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(12px);}
+        .sc-modal.open{display:flex;}.sc-card{background:linear-gradient(135deg,#1a0a2e 0%,#2d1460 50%,#0a1a2d 100%);border:1px solid rgba(168,85,247,0.5);border-radius:28px;padding:40px;max-width:420px;width:90%;text-align:center;position:relative;}
+        .sc-x{position:absolute;top:16px;right:20px;background:none;border:none;color:var(--text-dim);font-size:1.3rem;cursor:pointer;transition:color 0.2s;}.sc-x:hover{color:white;}
+        .sc-av{width:70px;height:70px;border-radius:50%;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-size:1.5rem;font-weight:900;color:white;background:linear-gradient(135deg,var(--accent-main),var(--accent-pink));}
+        .sc-art{font-family:'Nunito',sans-serif;font-size:1.8rem;font-weight:900;color:white;}.sc-ev{font-size:0.9rem;color:var(--accent-cyan);margin:6px 0 3px;}.sc-vc{font-size:0.8rem;color:var(--text-dim);}
+        .sc-pr{font-family:'Nunito',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--accent-main),var(--accent-pink));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin:14px 0;}
+        .sc-btns{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;}.sc-btn{padding:9px 18px;border-radius:12px;border:1px solid var(--glass-border);color:var(--text-dim);background:rgba(255,255,255,0.04);font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.2s;}.sc-btn:hover{color:white;border-color:var(--accent-main);background:rgba(168,85,247,0.15);}
+        .toast{position:fixed;bottom:30px;right:30px;padding:12px 22px;border-radius:14px;font-size:0.85rem;font-weight:700;z-index:400;opacity:0;transition:opacity 0.4s;pointer-events:none;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#10b981;}.toast.show{opacity:1;}
+        .map-pulse{animation:mpulse 2s infinite;}.map-pulse2{animation:mpulse 2s infinite;animation-delay:-1s;}
+        @keyframes mpulse{0%,100%{opacity:0.9;}50%{opacity:0.3;}}
+</style>
 </head>
 <body>
     <div class="aurora-container">
@@ -188,7 +224,7 @@
             <div class="logo-text"><h1>EliteStudio</h1><p>Admin Control</p></div>
         </div>
         
-        <div class="nav-label">Management</div>
+                <div class="nav-label">Management</div>
         <a th:href="@{/dashboard}" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
         <a th:href="@{/add-artist}" class="nav-link"><i class="fas fa-users-gear"></i> Artists & Payouts</a>
         <a th:href="@{/label/track-registration}" class="nav-link"><i class="fas fa-compact-disc"></i> Track Registry</a>
@@ -198,9 +234,12 @@
         <div class="nav-label">Rule Engine</div>
         <a th:href="@{/admin/platforms}" class="nav-link"><i class="fas fa-tower-broadcast"></i> Platforms</a>
         <a th:href="@{/admin/royalty-rules}" class="nav-link"><i class="fas fa-sliders"></i> Royalty Rules</a>
+        <a th:href="@{/admin/region-rates}" class="nav-link"><i class="fas fa-globe"></i> Region Rates</a>
+        <a th:href="@{/admin/contract-types}" class="nav-link"><i class="fas fa-file-contract"></i> Contract Types</a>
         <a th:href="@{/admin/revenue-share}" class="nav-link"><i class="fas fa-handshake"></i> Revenue Share</a>
+        <a th:href="@{/admin/dispute-rules}" class="nav-link"><i class="fas fa-flag"></i> Dispute Rules</a>
         <a th:href="@{/admin/calc-engine}" class="nav-link"><i class="fas fa-calculator"></i> Calc Engine</a>
-        
+        <a th:href="@{/admin/audit-logs}" class="nav-link"><i class="fas fa-scroll"></i> Audit Logs</a>
         <div style="margin-top:auto">
             <a th:href="@{/admin/logout}" class="nav-link" style="color:var(--accent-pink)"><i class="fas fa-right-from-bracket"></i> Logout</a>
         </div>
@@ -216,6 +255,31 @@
                 <span class="status-dot"></span>
                 TICKETING ACTIVE
             </div>
+        </div>
+
+        <!-- GENRE MOOD FILTER -->
+        <div class="g-tags">
+            <span class="g-tag on" onclick="filterGenre(this,'all')">🎵 All</span>
+            <span class="g-tag" onclick="filterGenre(this,'edm')">⚡ EDM</span>
+            <span class="g-tag" onclick="filterGenre(this,'hiphop')">🎤 Hip-Hop</span>
+            <span class="g-tag" onclick="filterGenre(this,'indie')">🎸 Indie</span>
+            <span class="g-tag" onclick="filterGenre(this,'pop')">🌟 Pop</span>
+            <span class="g-tag" onclick="filterGenre(this,'classical')">🎻 Classical</span>
+            <span class="g-tag" onclick="filterGenre(this,'acoustic')">🪕 Acoustic</span>
+            <span class="g-tag" onclick="filterGenre(this,'jazz')">🎷 Jazz</span>
+        </div>
+
+        <!-- HEADLINER WALL -->
+        <div class="h-wall" id="headlinerWall">
+            <div th:each="a,i : ${artists}" class="h-card" th:attr="data-name=${a.name}" onclick="openShareFromCard(this)">
+                <div class="h-av" th:style="${i.index%5==0?'background:linear-gradient(135deg,#a855f7,#ec4899)':i.index%5==1?'background:linear-gradient(135deg,#06b6d4,#3b82f6)':i.index%5==2?'background:linear-gradient(135deg,#10b981,#06b6d4)':i.index%5==3?'background:linear-gradient(135deg,#f59e0b,#ef4444)':'background:linear-gradient(135deg,#ec4899,#f59e0b)'}">
+                    <span th:text="${#strings.length(a.name)>=2?#strings.toUpperCase(#strings.substring(a.name,0,2)):a.name}">AR</span>
+                </div>
+                <div class="h-nm" th:text="${a.name}">Artist</div>
+                <div class="h-dt"><i class="fas fa-star" style="color:var(--accent-main)"></i> Headliner</div>
+                <div class="hyp"><div class="hype-fill-el" style="height:100%;border-radius:3px;width:0%;background:linear-gradient(90deg,var(--accent-main),var(--accent-pink))"></div></div>
+            </div>
+            <div th:if="${artists.empty}" style="color:var(--text-dim);font-size:0.85rem;padding:20px;flex-shrink:0">No artists registered</div>
         </div>
 
         <div class="content-grid">
@@ -238,6 +302,9 @@
                         
                         <label class="form-label">Base Price ($)</label>
                         <input type="number" step="0.01" name="ticketPrice" class="form-input" placeholder="0.00" required>
+                        
+                        <label class="form-label">Venue Capacity (Seats)</label>
+                        <input type="number" name="totalCapacity" class="form-input" placeholder="500" value="500" min="10" required>
                         
                         <label class="form-label">Assign Artist</label>
                         <select name="artistId" class="form-input" required style="background-color: #130f26;">
@@ -273,6 +340,9 @@
                                             <i class="fas fa-location-dot" style="color:var(--accent-pink)"></i>
                                             <span th:text="${event.venue}">Venue</span> &bull; 
                                             <span th:text="${event.eventDate}">Date</span>
+                                        </div>
+                                        <div class="event-countdown" style="font-size:0.7rem; color:var(--accent-cyan); font-weight:800; margin-top:5px;" th:data-date="${event.eventDate}">
+                                            <i class="fas fa-circle-notch fa-spin"></i> SYNCING...
                                         </div>
                                     </td>
                                     <td><span class="artist-chip" th:text="${event.artist.name}">Artist</span></td>
@@ -319,6 +389,176 @@
                 </div>
             </div>
         </div>
+
+        <!-- WORLD TOUR MAP -->
+        <div class="panel" style="margin-bottom:25px">
+            <div class="panel-header">
+                <div class="panel-title"><i class="fas fa-earth-americas" style="color:var(--accent-cyan)"></i> Global Tour Circuit</div>
+                <span class="badge badge-cyan">LIVE ROUTES</span>
+            </div>
+            <div style="padding:24px">
+                <svg viewBox="0 0 900 180" style="width:100%;height:160px">
+                    <ellipse cx="180" cy="80" rx="120" ry="60" fill="rgba(168,85,247,0.07)" stroke="rgba(168,85,247,0.2)" stroke-width="1"/>
+                    <ellipse cx="240" cy="148" rx="55" ry="38" fill="rgba(168,85,247,0.05)" stroke="rgba(168,85,247,0.13)" stroke-width="1"/>
+                    <ellipse cx="450" cy="65" rx="65" ry="42" fill="rgba(6,182,212,0.07)" stroke="rgba(6,182,212,0.2)" stroke-width="1"/>
+                    <ellipse cx="468" cy="138" rx="58" ry="48" fill="rgba(6,182,212,0.05)" stroke="rgba(6,182,212,0.13)" stroke-width="1"/>
+                    <ellipse cx="660" cy="75" rx="138" ry="55" fill="rgba(236,72,153,0.05)" stroke="rgba(236,72,153,0.13)" stroke-width="1"/>
+                    <ellipse cx="728" cy="152" rx="58" ry="32" fill="rgba(245,158,11,0.06)" stroke="rgba(245,158,11,0.15)" stroke-width="1"/>
+                    <circle cx="160" cy="74" r="7" fill="#a855f7" class="map-pulse"/><circle cx="160" cy="74" r="14" fill="#a855f7" opacity="0.15" class="map-pulse"/>
+                    <circle cx="455" cy="58" r="7" fill="#06b6d4" class="map-pulse2"/><circle cx="455" cy="58" r="14" fill="#06b6d4" opacity="0.15" class="map-pulse2"/>
+                    <circle cx="655" cy="68" r="7" fill="#ec4899" class="map-pulse"/><circle cx="655" cy="68" r="14" fill="#ec4899" opacity="0.15" class="map-pulse"/>
+                    <circle cx="228" cy="142" r="5" fill="#f59e0b" class="map-pulse2"/>
+                    <circle cx="722" cy="148" r="5" fill="#10b981" class="map-pulse"/>
+                    <text x="160" y="65" fill="rgba(255,255,255,0.75)" font-size="9" font-family="Plus Jakarta Sans,sans-serif" text-anchor="middle">New York</text>
+                    <text x="455" y="50" fill="rgba(255,255,255,0.75)" font-size="9" font-family="Plus Jakarta Sans,sans-serif" text-anchor="middle">London</text>
+                    <text x="655" y="60" fill="rgba(255,255,255,0.75)" font-size="9" font-family="Plus Jakarta Sans,sans-serif" text-anchor="middle">Mumbai</text>
+                    <text x="228" y="135" fill="rgba(255,255,255,0.6)" font-size="8" font-family="Plus Jakarta Sans,sans-serif" text-anchor="middle">São Paulo</text>
+                    <text x="722" y="141" fill="rgba(255,255,255,0.6)" font-size="8" font-family="Plus Jakarta Sans,sans-serif" text-anchor="middle">Sydney</text>
+                </svg>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">
+                    <span th:each="ev : ${upcomingEvents}" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border);padding:5px 12px;border-radius:20px;font-size:0.72rem;color:var(--text-dim);font-weight:600">
+                        <span style="width:6px;height:6px;background:var(--accent-main);border-radius:50%;display:inline-block;box-shadow:0 0 6px var(--accent-main)"></span>
+                        <span th:text="${ev.venue}">Venue</span>
+                    </span>
+                    <span th:if="${upcomingEvents.empty}" style="color:var(--text-dim);font-size:0.82rem">No tour dates scheduled</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- LEADERBOARD + BANNER BUILDER -->
+        <div class="two-col">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-trophy" style="color:#ffd700"></i> Top Events Leaderboard</div>
+                    <span class="badge badge-purple">BOX OFFICE</span>
+                </div>
+                <div id="lbList">
+                    <div th:each="ev,i : ${upcomingEvents}" class="lb-row">
+                        <div class="rnk" th:classappend="${i.index==0?'r1':i.index==1?'r2':i.index==2?'r3':'rX'}" th:text="${i.index+1}">1</div>
+                        <div style="flex:1;min-width:0">
+                            <div style="font-weight:700;color:white;font-size:0.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" th:text="${ev.name}">Event</div>
+                            <div style="font-size:0.7rem;color:var(--text-dim)" th:text="${ev.artist.name}">Artist</div>
+                            <div class="lb-bg" style="margin-top:6px"><div class="lb-fg" th:style="'width:' + (100 - i.index * 18) + '%'"></div></div>
+                        </div>
+                        <div style="font-family:'Nunito',sans-serif;font-weight:900;color:var(--accent-main);font-size:0.9rem" th:text="${'$' + #numbers.formatDecimal(ev.ticketPrice * 100, 1, 0)}">$0</div>
+                    </div>
+                    <div th:if="${upcomingEvents.empty}" style="padding:40px;text-align:center;color:var(--text-dim);font-size:0.85rem"><i class="fas fa-trophy" style="font-size:2rem;opacity:0.2;display:block;margin-bottom:10px"></i>No events yet</div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-bullhorn" style="color:var(--accent-pink)"></i> Promo Banner Builder</div>
+                    <span class="badge badge-pink">LIVE PREVIEW</span>
+                </div>
+                <div style="padding:24px">
+                    <input id="bnrTitle" oninput="updateBanner()" class="form-input" placeholder="Artist Name — Event Title" style="margin-bottom:12px">
+                    <input id="bnrMeta" oninput="updateBanner()" class="form-input" placeholder="Venue • Date • City" style="margin-bottom:12px">
+                    <div class="bnr-prev">
+                        <div class="bnr-t" id="bnrTitlePrev">Your Event Title</div>
+                        <div class="bnr-m" id="bnrMetaPrev">Venue • Date • City</div>
+                    </div>
+                    <button onclick="copyBanner()" style="margin-top:14px;width:100%;padding:11px;background:rgba(236,72,153,0.15);border:1px solid rgba(236,72,153,0.3);color:var(--accent-pink);border-radius:12px;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all 0.2s" onmouseover="this.style.background='rgba(236,72,153,0.25)'" onmouseout="this.style.background='rgba(236,72,153,0.15)'">
+                        <i class="fas fa-copy"></i> Copy Announcement
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- REMINDER SCHEDULER + RANDOM GENERATOR -->
+        <div class="two-col">
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-bell" style="color:var(--accent-orange)"></i> Event Reminder Scheduler</div>
+                </div>
+                <div style="padding:24px" id="reminderList">
+                    <div th:each="ev : ${upcomingEvents}" class="rem-row">
+                        <div>
+                            <div style="font-size:0.82rem;font-weight:700;color:white" th:text="${ev.name}">Event</div>
+                            <div style="font-size:0.68rem;color:var(--text-dim)" th:text="${ev.eventDate}">Date</div>
+                        </div>
+                        <button class="sc-btn" th:attr="data-event=${ev.name}" onclick="setReminder(this)" style="padding:6px 14px;font-size:0.72rem"><i class="fas fa-bell"></i> Set Alert</button>
+                    </div>
+                    <div th:if="${upcomingEvents.empty}" style="text-align:center;padding:40px;color:var(--text-dim);font-size:0.85rem"><i class="fas fa-bell-slash" style="font-size:2rem;opacity:0.2;display:block;margin-bottom:10px"></i>No events to remind</div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-dice" style="color:var(--accent-cyan)"></i> Random Event Generator</div>
+                </div>
+                <div style="padding:24px">
+                    <p style="font-size:0.82rem;color:var(--text-dim);margin-bottom:16px;line-height:1.6">Feeling uninspired? Let us generate a creative event concept and fill the scheduler form instantly.</p>
+                    <button class="btn-inspire" onclick="generateRandom()"><i class="fas fa-wand-magic-sparkles"></i> Inspire Me!</button>
+                    <div id="randPreview" style="display:none;background:rgba(6,182,212,0.06);border:1px solid rgba(6,182,212,0.2);border-radius:14px;padding:16px">
+                        <div style="font-size:0.72rem;color:var(--accent-cyan);font-weight:700;margin-bottom:6px">GENERATED CONCEPT</div>
+                        <div id="randName" style="font-family:'Nunito',sans-serif;font-weight:900;color:white;font-size:1rem"></div>
+                        <div id="randMeta" style="font-size:0.75rem;color:var(--text-dim);margin-top:4px"></div>
+                        <button onclick="applyRandom()" style="margin-top:12px;padding:9px 18px;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.3);color:var(--accent-cyan);border-radius:10px;font-weight:700;font-size:0.78rem;cursor:pointer"><i class="fas fa-arrow-right"></i> Apply to Form</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
+
+    <!-- SHARE CARD MODAL -->
+    <div class="sc-modal" id="scModal">
+        <div class="sc-card">
+            <button class="sc-x" onclick="closeShare()"><i class="fas fa-xmark"></i></button>
+            <div class="sc-av" id="scAv">AR</div>
+            <div class="sc-art" id="scArt">Artist Name</div>
+            <div class="sc-ev" id="scEv">Event Name</div>
+            <div class="sc-vc" id="scVc">Venue • Date</div>
+            <div class="sc-pr" id="scPr">$0.00</div>
+            <div style="font-size:0.7rem;color:var(--text-dim);margin-top:-10px">per ticket</div>
+            <div class="sc-btns">
+                <button class="sc-btn" onclick="copyShareText()"><i class="fas fa-copy"></i> Copy</button>
+                <button class="sc-btn" onclick="showToast('Shared to Instagram! ✨')"><i class="fab fa-instagram"></i> Story</button>
+                <button class="sc-btn" onclick="showToast('Tweet scheduled! 🐦')"><i class="fab fa-twitter"></i> Tweet</button>
+                <button class="sc-btn" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </div>
+    </div>
+    <div class="toast" id="toastEl"></div>
+
+    <script>
+        function updateCountdowns(){const elements=document.querySelectorAll('.event-countdown');const now=new Date().getTime();elements.forEach(el=>{const d=el.getAttribute('data-date');if(!d)return;const t=new Date(d+'T00:00:00').getTime();const diff=t-now;if(diff<0){el.innerHTML='<i class="fas fa-satellite-dish"></i> EVENT LIVE / CONCLUDED';el.style.color='var(--accent-pink)';}else{const dy=Math.floor(diff/86400000);const hr=Math.floor((diff%86400000)/3600000);const mn=Math.floor((diff%3600000)/60000);const sc=Math.floor((diff%60000)/1000);el.innerHTML=`<i class="fas fa-clock"></i> STARTS IN: ${dy}d ${hr}h ${mn}m ${sc}s`;}});}
+        setInterval(updateCountdowns,1000);updateCountdowns();
+
+        // Hype bars on headliner wall
+        document.querySelectorAll('.hype-fill-el').forEach((el,i)=>{const pct=Math.floor(Math.random()*60+30);el.style.width=pct+'%';el.style.background=pct>75?'linear-gradient(90deg,#ef4444,#f59e0b)':pct>50?'linear-gradient(90deg,#f59e0b,#10b981)':'linear-gradient(90deg,#06b6d4,#a855f7)';});
+
+        // Genre filter
+        function filterGenre(el,g){document.querySelectorAll('.g-tag').forEach(t=>t.classList.remove('on'));el.classList.add('on');showToast('Filtered: '+el.textContent.trim());}
+
+        // Headliner click → share modal
+        function openShareFromCard(card){const name=card.getAttribute('data-name')||'Artist';openShare(name,'Upcoming Tour Event','Grand Venue','TBD','$0.00');}
+
+        // Share modal
+        let _shareData={};
+        function openShare(artist,event,venue,date,price){_shareData={artist,event,venue,date,price};document.getElementById('scAv').textContent=(artist||'A').substring(0,2).toUpperCase();document.getElementById('scArt').textContent=artist;document.getElementById('scEv').textContent=event;document.getElementById('scVc').textContent=venue+' • '+date;document.getElementById('scPr').textContent=price;document.getElementById('scModal').classList.add('open');}
+        function closeShare(){document.getElementById('scModal').classList.remove('open');}
+        function copyShareText(){const t=`🎵 ${_shareData.artist} — ${_shareData.event}\n📍 ${_shareData.venue} | ${_shareData.date}\n🎟️ Tickets from ${_shareData.price}`;navigator.clipboard.writeText(t).then(()=>showToast('Copied to clipboard! 📋'));}
+
+        // Banner builder
+        function updateBanner(){document.getElementById('bnrTitlePrev').textContent=document.getElementById('bnrTitle').value||'Your Event Title';document.getElementById('bnrMetaPrev').textContent=document.getElementById('bnrMeta').value||'Venue • Date • City';}
+        function copyBanner(){const t=document.getElementById('bnrTitle').value+' | '+document.getElementById('bnrMeta').value;navigator.clipboard.writeText(t).then(()=>showToast('Announcement copied! 📢'));}
+
+        // Reminder scheduler
+        function setReminder(btn){const ev=btn.getAttribute('data-event');const reminders=JSON.parse(localStorage.getItem('evReminders')||'[]');if(!reminders.includes(ev)){reminders.push(ev);localStorage.setItem('evReminders',JSON.stringify(reminders));}btn.innerHTML='<i class="fas fa-check"></i> Reminder Set';btn.style.color='#10b981';btn.style.borderColor='rgba(16,185,129,0.4)';showToast('Reminder set for: '+ev+' 🔔');}
+
+        // Random event generator
+        const _rNames=['Midnight Bloom','Neon Serenade','Eclipse Sessions','Aurora Live','Velvet Underground Vibes','Cosmic Groove','Starfall Concert','Electric Dreams'];
+        const _rVenues=['Rooftop Terrace','Amphitheatre','Metro Arena','Jazz Lounge','Beach Stage','Crystal Hall','The Grand Pavilion','Night Garden'];
+        const _rGenres=['Lo-Fi Chill','Indie Pop','Electronic','Acoustic Soul','Neo-Soul','Afrobeats','EDM','R&B'];
+        let _rData={};
+        function generateRandom(){const n=_rNames[Math.floor(Math.random()*_rNames.length)];const v=_rVenues[Math.floor(Math.random()*_rVenues.length)];const g=_rGenres[Math.floor(Math.random()*_rGenres.length)];_rData={n,v,g};document.getElementById('randName').textContent=n;document.getElementById('randMeta').textContent=v+' • '+g;document.getElementById('randPreview').style.display='block';}
+        function applyRandom(){if(!_rData.n)return;const f=document.querySelector('[name="name"]');const fv=document.querySelector('[name="venue"]');if(f)f.value=_rData.n;if(fv)fv.value=_rData.v;showToast('Event concept applied to form! 🎲');document.getElementById('randPreview').style.display='none';}
+
+        // Toast
+        function showToast(msg){const t=document.getElementById('toastEl');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+        // Check saved reminders on load
+        window.addEventListener('load',()=>{const rem=JSON.parse(localStorage.getItem('evReminders')||'[]');document.querySelectorAll('[data-event]').forEach(btn=>{if(rem.includes(btn.getAttribute('data-event'))){btn.innerHTML='<i class="fas fa-check"></i> Reminder Set';btn.style.color='#10b981';btn.style.borderColor='rgba(16,185,129,0.4)';}});});
+    </script>
 </body>
 </html>

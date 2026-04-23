@@ -1,279 +1,175 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head>
-    <title>Add Artist | Admin</title>
+    <title>Artists & Payouts | EliteStudio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --pl: #e8e0f5;
-            --pr: #fce8ee;
-            --pm: #ddf5ee;
-            --ps: #dceefb;
-            --ap: #9b7fd4;
-            --ak: #e07ca0;
-            --at: #4daa90;
-            --ab: #5ba3d9;
-            --td: #2d2746;
-            --tm: #6b6489;
-            --tl: #a09bbf;
-            --cb: rgba(180, 160, 220, 0.22);
+            --bg-deep:      #0a061a;
+            --aurora-1:     #3a1c71;
+            --aurora-2:     #d76d77;
+            --aurora-3:     #ffaf7b;
+            --accent-main:  #a855f7;
+            --accent-pink:  #ec4899;
+            --accent-cyan:  #06b6d4;
+            --accent-orange: #f59e0b;
+            --accent-red:    #ef4444;
+            --glass-bg:     rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-ghost:   #e2e8f0;
+            --text-dim:     #94a3b8;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: linear-gradient(135deg, #f0ebff 0%, #fce8ee 40%, #dceefb 75%, #ddf5ee 100%);
-            font-family: 'Inter', sans-serif;
-            color: var(--td);
-            min-height: 100vh;
+            background-color: var(--bg-deep);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-ghost);
+            height: 100vh;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 32px 16px;
-            overflow-x: hidden;
+            overflow: hidden;
         }
 
-        h1,
-        h2,
-        h3,
-        h4,
-        h5 {
-            font-family: 'Nunito', sans-serif;
+        /* --- IMMERSIVE AURORA BACKGROUND --- */
+        .aurora-container {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+        }
+        .aurora {
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.2;
+            animation: auroraMove 25s infinite alternate;
+        }
+        .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
+        .aurora-2 { width: 70vw; height: 70vh; background: var(--aurora-2); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .aurora-3 { width: 50vw; height: 50vh; background: var(--aurora-3); top: 30%; right: 10%; animation-delay: -10s; }
+
+        @keyframes auroraMove {
+            0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+            100% { transform: translate(100px, 50px) rotate(30deg) scale(1.1); }
         }
 
-        .blob {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: .4;
-            z-index: 0;
-            pointer-events: none;
-            animation: drift 18s ease-in-out infinite alternate;
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px; flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border-right: 1px solid var(--glass-border);
+            padding: 40px 20px; display: flex; flex-direction: column;
+            position: relative; z-index: 50;
+            overflow-y: auto;
         }
 
-        .b1 {
-            width: 460px;
-            height: 460px;
-            background: var(--pl);
-            top: -10%;
-            left: -8%;
+        .logo-row { display: flex; align-items: center; gap: 15px; margin-bottom: 45px; padding: 0 10px; }
+        .logo-icon {
+            width: 44px; height: 44px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink));
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-size: 1.1rem; box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3);
+        }
+        .logo-text h1 { font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 900; color: white; line-height: 1; }
+        .logo-text p { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-cyan); }
+
+        .nav-label {
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.2em; color: var(--text-dim); padding: 0 12px;
+            margin-bottom: 12px; margin-top: 30px;
         }
 
-        .b2 {
-            width: 360px;
-            height: 360px;
-            background: var(--pr);
-            bottom: 0;
-            right: -8%;
-            animation-delay: -5s;
+        .nav-link {
+            display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+            border-radius: 16px; color: var(--text-dim); font-weight: 600;
+            font-size: 0.88rem; text-decoration: none; transition: all 0.3s; margin-bottom: 5px;
+        }
+        .nav-link i { width: 20px; text-align: center; font-size: 1rem; }
+        .nav-link:hover { color: white; background: rgba(255, 255, 255, 0.05); transform: translateX(5px); }
+        .nav-link.active {
+            color: white; background: rgba(168, 85, 247, 0.15);
+            border-left: 4px solid var(--accent-main); border-radius: 4px 16px 16px 4px;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.1);
         }
 
-        .b3 {
-            width: 300px;
-            height: 300px;
-            background: var(--pm);
-            bottom: 15%;
-            left: 5%;
-            animation-delay: -12s;
-        }
+        /* --- MAIN CONTENT --- */
+        .main { flex: 1; padding: 50px; overflow-y: auto; position: relative; z-index: 10; display: flex; flex-direction: column; }
+        .main::-webkit-scrollbar { width: 6px; }
+        .main::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
 
-        @keyframes drift {
-            0% {
-                transform: translate(0, 0) scale(1)
-            }
+        .page-header { margin-bottom: 45px; }
+        .page-title { font-family: 'Nunito', sans-serif; font-size: 2.8rem; font-weight: 900; color: white; letter-spacing: -1px; }
+        .page-title span { background: linear-gradient(135deg, var(--accent-main), var(--accent-pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 
-            100% {
-                transform: translate(28px, 22px) scale(1.07)
-            }
-        }
-
-        .back-link {
-            position: fixed;
-            top: 24px;
-            left: 24px;
-            z-index: 200;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: white;
-            border: 1px solid var(--cb);
-            padding: 9px 16px;
-            border-radius: 30px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--tm);
-            text-decoration: none;
-            box-shadow: 0 4px 16px rgba(155, 127, 212, 0.1);
-            transition: all 0.25s;
-        }
-
-        .back-link:hover {
-            color: var(--ap);
-            transform: translateX(-3px);
+        .form-container {
+            display: flex; justify-content: center; align-items: flex-start; gap: 40px; flex-wrap: wrap;
         }
 
         .card {
-            position: relative;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(28px);
-            border: 1px solid var(--cb);
-            border-radius: 32px;
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6) inset, 0 24px 70px rgba(155, 127, 212, 0.15);
-            width: 100%;
-            max-width: 500px;
-            padding: 48px 44px;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 36px; padding: 45px; backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px); width: 100%; max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
         }
 
         .card-icon {
-            width: 56px;
-            height: 56px;
-            background: linear-gradient(135deg, var(--ap), var(--at));
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.4rem;
-            margin: 0 auto 20px;
-            box-shadow: 0 8px 24px rgba(155, 127, 212, 0.35);
+            width: 64px; height: 64px; border-radius: 20px;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-cyan));
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-size: 1.6rem; margin: 0 auto 25px; box-shadow: 0 10px 25px rgba(168, 85, 247, 0.4);
         }
 
-        .card-title {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--td);
-            text-align: center;
-            letter-spacing: -0.5px;
-            margin-bottom: 6px;
-        }
-
-        .card-sub {
-            font-size: 0.72rem;
-            font-weight: 600;
-            color: var(--tl);
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.12em;
-            margin-bottom: 36px;
-        }
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.66rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--tl);
-            margin-bottom: 7px;
-        }
-
-        .input-wrap {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--tl);
-            font-size: 0.85rem;
-        }
-
+        .form-label { display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.12em; color: var(--text-dim); margin-bottom: 10px; padding-left: 5px; }
+        
+        .input-wrap { position: relative; margin-bottom: 25px; }
+        .input-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); color: var(--accent-main); font-size: 1rem; }
         .form-input {
-            width: 100%;
-            padding: 13px 14px 13px 40px;
-            background: rgba(248, 246, 255, 0.9);
-            border: 1.5px solid rgba(180, 160, 220, 0.28);
-            border-radius: 13px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.87rem;
-            font-weight: 600;
-            color: var(--td);
-            outline: none;
-            transition: all 0.2s;
+            width: 100%; padding: 16px 18px 16px 50px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border); border-radius: 18px;
+            font-family: inherit; font-size: 0.95rem; color: white; outline: none; transition: all 0.3s;
         }
+        .form-input:focus { border-color: var(--accent-main); background: rgba(255,255,255,0.06); box-shadow: 0 0 20px rgba(168, 85, 247, 0.15); }
+        .form-input::placeholder { color: rgba(255,255,255,0.2); }
 
-        .form-input:focus {
-            border-color: var(--ap);
-            box-shadow: 0 0 0 4px rgba(155, 127, 212, 0.12);
-            background: white;
+        .btn-submit {
+            width: 100%; padding: 18px;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink));
+            color: white; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900;
+            border: none; border-radius: 20px; cursor: pointer;
+            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.3);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            text-transform: uppercase; letter-spacing: 0.1em; margin-top: 10px;
         }
-
-        .form-input::placeholder {
-            color: var(--tl);
-            font-weight: 400;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--ap), var(--ak));
-            color: white;
-            font-family: 'Nunito', sans-serif;
-            font-size: 0.9rem;
-            font-weight: 900;
-            border: none;
-            border-radius: 14px;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(155, 127, 212, 0.35);
-            transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(155, 127, 212, 0.48);
-        }
+        .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(168, 85, 247, 0.5); }
 
         .secure-note {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 0.67rem;
-            color: var(--tl);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            margin-top: 22px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            font-size: 0.7rem; color: var(--text-dim); font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.1em; margin-top: 30px;
         }
     </style>
 </head>
-
 <body>
+    <div class="aurora-container">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+    </div>
+
     <aside class="sidebar">
         <div class="logo-row">
             <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
-            <div class="logo-text"><h1>SysAdmin</h1><p>Rule Engine</p></div>
+            <div class="logo-text"><h1>EliteStudio</h1><p>Admin Control</p></div>
         </div>
+        
         <div class="nav-label">Management</div>
         <a th:href="@{/dashboard}" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
-        <a th:href="@{/add-artist}" class="nav-link active"><i class="fas fa-users-gear"></i> Artists &amp; Payouts</a>
+        <a th:href="@{/add-artist}" class="nav-link active"><i class="fas fa-users-gear"></i> Artists & Payouts</a>
         <a th:href="@{/label/track-registration}" class="nav-link"><i class="fas fa-compact-disc"></i> Track Registry</a>
         <a th:href="@{/admin/events}" class="nav-link"><i class="fas fa-calendar-star"></i> Live Events</a>
         <a th:href="@{/label/analytics}" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
         
         <div class="nav-label">Rule Engine</div>
-        <a th:href="@{/admin/platforms}" class="nav-link"><i class="fas fa-tower-broadcast"></i> Platform Master</a>
+        <a th:href="@{/admin/platforms}" class="nav-link"><i class="fas fa-tower-broadcast"></i> Platforms</a>
         <a th:href="@{/admin/royalty-rules}" class="nav-link"><i class="fas fa-sliders"></i> Royalty Rules</a>
         <a th:href="@{/admin/region-rates}" class="nav-link"><i class="fas fa-globe"></i> Region Rates</a>
         <a th:href="@{/admin/contract-types}" class="nav-link"><i class="fas fa-file-contract"></i> Contract Types</a>
@@ -283,43 +179,46 @@
         <a th:href="@{/admin/audit-logs}" class="nav-link"><i class="fas fa-scroll"></i> Audit Logs</a>
         
         <div style="margin-top:auto">
-            <a th:href="@{/admin/logout}" class="nav-link" style="color:var(--ar)"><i class="fas fa-right-from-bracket"></i> Logout</a>
+            <a th:href="@{/admin/logout}" class="nav-link" style="color:var(--accent-red)"><i class="fas fa-right-from-bracket"></i> Logout</a>
         </div>
     </aside>
 
-    <main style="flex:1; display:flex; align-items:center; justify-content:center; padding:40px; position:relative; z-index:1;">
-        <div class="card">
-            <div class="card-icon"><i class="fas fa-user-plus"></i></div>
-            <h2 class="card-title">Add New Artist</h2>
-            <p class="card-sub">Register an artist to the platform</p>
+    <main class="main">
+        <div class="page-header">
+            <h2 class="page-title">Artist <span>Onboarding</span></h2>
+        </div>
 
-            <form th:action="@{/save-artist}" th:object="${artist}" method="post">
-                <div class="form-group">
-                    <label class="form-label">Artist / Stage Name</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-microphone input-icon"></i>
-                        <input type="text" th:field="*{name}" class="form-input" placeholder="e.g. Aria Stone" required>
+        <div class="form-container">
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-user-plus"></i></div>
+                <form th:action="@{/save-artist}" th:object="${artist}" method="post">
+                    <div class="form-group">
+                        <label class="form-label">Artist / Stage Name</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-microphone input-icon"></i>
+                            <input type="text" th:field="*{name}" class="form-input" placeholder="e.g. Noah Rodes" required>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <div class="input-wrap">
-                        <i class="fas fa-at input-icon"></i>
-                        <input type="email" th:field="*{email}" class="form-input" placeholder="artist@example.com"
-                            required>
+                    <div class="form-group">
+                        <label class="form-label">Primary Email Address</label>
+                        <div class="input-wrap">
+                            <i class="fas fa-at input-icon"></i>
+                            <input type="email" th:field="*{email}" class="form-input" placeholder="artist@elitestudio.com" required>
+                        </div>
                     </div>
-                </div>
-                <button type="submit" class="btn-primary">
-                    <i class="fas fa-user-check"></i> Register Artist
-                </button>
-            </form>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-user-check"></i> REGISTER ARTIST
+                    </button>
+                </form>
 
-            <div class="secure-note">
-                <i class="fas fa-shield-halved" style="color:var(--at)"></i>
-                Securely registered to the platform
+                <div class="secure-note">
+                    <i class="fas fa-shield-check" style="color:var(--accent-cyan)"></i>
+                    SECURE REGISTRATION PROTOCOL ACTIVE
+                </div>
             </div>
+
+            <!-- Optional: Payouts/Artists list could be added here if needed, but the user requested "forms" mostly -->
         </div>
     </main>
 </body>
-
 </html>

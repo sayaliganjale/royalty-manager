@@ -1,108 +1,172 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Track Registry | Admin</title>
+    <title>Track Registry | EliteStudio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
     <style>
-        :root{--pl:#e8e0f5;--pr:#fce8ee;--pm:#ddf5ee;--ps:#dceefb;--pp:#fdecd8;--ap:#9b7fd4;--ak:#e07ca0;--at:#4daa90;--ab:#5ba3d9;--td:#2d2746;--tm:#6b6489;--tl:#a09bbf;--cb:rgba(180,160,220,0.22);}
-        *{box-sizing:border-box;margin:0;padding:0;}
-        body{background:linear-gradient(135deg,#f0ebff 0%,#fce8ee 40%,#dceefb 75%,#ddf5ee 100%);font-family:'Inter',sans-serif;color:var(--td);min-height:100vh;display:flex;overflow-x:hidden;}
-        h1,h2,h3,h4,h5{font-family:'Nunito',sans-serif;}
-        .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.35;z-index:0;pointer-events:none;animation:drift 20s ease-in-out infinite alternate;}
-        .b1{width:460px;height:460px;background:var(--pl);top:-10%;left:10%;}
-        .b2{width:360px;height:360px;background:var(--pr);top:50%;right:-5%;animation-delay:-8s;}
-        .b3{width:300px;height:300px;background:var(--pm);bottom:-5%;left:30%;animation-delay:-14s;}
-        @keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(32px,24px) scale(1.07)}}
+        :root {
+            --bg-deep:      #0a061a;
+            --aurora-1:     #3a1c71;
+            --aurora-2:     #d76d77;
+            --aurora-3:     #ffaf7b;
+            --accent-main:  #a855f7;
+            --accent-pink:  #ec4899;
+            --accent-cyan:  #06b6d4;
+            --glass-bg:     rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-ghost:   #e2e8f0;
+            --text-dim:     #94a3b8;
+        }
 
-        .sidebar{width:250px;flex-shrink:0;background:rgba(255,255,255,0.75);backdrop-filter:blur(24px);border-right:1px solid var(--cb);padding:32px 18px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:50;box-shadow:4px 0 24px rgba(155,127,212,0.07);}
-        .logo-row{display:flex;align-items:center;gap:12px;margin-bottom:36px;padding:0 6px;}
-        .logo-icon{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--ap),var(--ak));display:flex;align-items:center;justify-content:center;color:white;font-size:1rem;box-shadow:0 6px 16px rgba(155,127,212,0.35);}
-        .logo-text h1{font-size:1rem;font-weight:900;color:var(--td);}
-        .logo-text p{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--tl);}
-        .nav-label{font-size:0.58rem;font-weight:800;text-transform:uppercase;letter-spacing:0.15em;color:var(--tl);padding:0 8px;margin-bottom:8px;margin-top:20px;}
-        .nav-link{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:11px;color:var(--tm);font-weight:600;font-size:0.82rem;text-decoration:none;transition:all 0.2s;margin-bottom:3px;}
-        .nav-link i{width:16px;text-align:center;font-size:0.85rem;}
-        .nav-link:hover{color:var(--td);background:rgba(155,127,212,0.08);transform:translateX(3px);}
-        .nav-link.active{color:var(--ap);background:var(--pl);border-left:3px solid var(--ap);border-radius:0 11px 11px 0;font-weight:700;}
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .main{flex:1;padding:40px 44px;overflow-y:auto;max-height:100vh;position:relative;z-index:1;}
-        .main::-webkit-scrollbar{width:5px;}
-        .main::-webkit-scrollbar-thumb{background:var(--pl);border-radius:10px;}
+        body {
+            background-color: var(--bg-deep);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-ghost);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
 
-        .page-header{margin-bottom:36px;}
-        .page-title{font-size:2.2rem;font-weight:900;color:var(--td);letter-spacing:-0.8px;}
-        .page-title span{background:linear-gradient(135deg,var(--ap),var(--ab));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-        .page-sub{font-size:0.82rem;color:var(--tm);margin-top:4px;}
+        /* --- IMMERSIVE AURORA BACKGROUND --- */
+        .aurora-container {
+            position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+        }
+        .aurora {
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.2;
+            animation: auroraMove 25s infinite alternate;
+        }
+        .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
+        .aurora-2 { width: 70vw; height: 70vh; background: var(--aurora-2); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .aurora-3 { width: 50vw; height: 50vh; background: var(--aurora-3); top: 30%; right: 10%; animation-delay: -10s; }
 
-        .content-grid{display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start;}
-        @media(max-width:1100px){.content-grid{grid-template-columns:1fr;}}
+        @keyframes auroraMove {
+            0%   { transform: translate(0,0) rotate(0deg) scale(1); }
+            100% { transform: translate(100px, 50px) rotate(30deg) scale(1.1); }
+        }
 
-        .panel{background:rgba(255,255,255,0.88);border:1px solid var(--cb);border-radius:24px;box-shadow:0 8px 32px rgba(155,127,212,0.09);overflow:hidden;transition:transform 0.3s,box-shadow 0.3s;}
-        .panel:hover{transform:translateY(-3px);box-shadow:0 14px 48px rgba(155,127,212,0.15);}
-        .panel-header{padding:20px 28px;border-bottom:1px solid rgba(180,160,220,0.15);display:flex;align-items:center;gap:10px;background:rgba(248,246,255,0.4);}
-        .panel-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
-        .panel-title{font-size:0.92rem;font-weight:800;color:var(--td);}
-        .panel-body{padding:28px;}
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px; flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            border-right: 1px solid var(--glass-border);
+            padding: 40px 20px; display: flex; flex-direction: column;
+            position: relative; z-index: 50;
+         overflow-y: auto;}
 
-        .form-group{margin-bottom:16px;}
-        .form-label{display:block;font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--tl);margin-bottom:7px;}
-        .input-wrap{position:relative;}
-        .input-icon{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--tl);font-size:0.82rem;}
-        .form-input{width:100%;padding:12px 14px 12px 38px;background:rgba(248,246,255,0.9);border:1.5px solid rgba(180,160,220,0.28);border-radius:12px;font-family:'Inter',sans-serif;font-size:0.86rem;font-weight:600;color:var(--td);outline:none;transition:all 0.2s;}
-        .form-input:focus{border-color:var(--ap);box-shadow:0 0 0 4px rgba(155,127,212,0.1);background:white;}
-        .form-input::placeholder{color:var(--tl);font-weight:400;}
-        .form-input.no-icon{padding-left:14px;}
-        select.form-input{cursor:pointer;}
-        select option{color:var(--td);background:white;}
-        .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+        .logo-row { display: flex; align-items: center; gap: 15px; margin-bottom: 45px; padding: 0 10px; }
+        .logo-icon {
+            width: 44px; height: 44px; border-radius: 14px;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink));
+            display: flex; align-items: center; justify-content: center; color: white;
+            font-size: 1.1rem; box-shadow: 0 10px 20px rgba(168, 85, 247, 0.3);
+        }
+        .logo-text h1 { font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 900; color: white; line-height: 1; }
+        .logo-text p { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent-cyan); }
 
-        .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:rgba(248,246,255,0.7);border:1px solid rgba(180,160,220,0.2);border-radius:14px;margin-bottom:16px;}
-        .toggle-label h4{font-weight:700;font-size:0.85rem;color:var(--td);}
-        .toggle-label p{font-size:0.68rem;color:var(--tl);margin-top:2px;}
-        .toggle{width:46px;height:24px;background:rgba(155,127,212,0.2);border-radius:30px;padding:3px;cursor:pointer;position:relative;transition:background 0.3s;border:none;}
-        .toggle-thumb{width:18px;height:18px;background:var(--ap);border-radius:50%;box-shadow:0 2px 6px rgba(155,127,212,0.4);transition:transform 0.3s;}
+        .nav-label {
+            font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.2em; color: var(--text-dim); padding: 0 12px;
+            margin-bottom: 12px; margin-top: 30px;
+        }
 
-        .btn-register{width:100%;padding:14px;background:linear-gradient(135deg,var(--ap),var(--ak));color:white;font-family:'Nunito',sans-serif;font-size:0.9rem;font-weight:900;border:none;border-radius:14px;cursor:pointer;box-shadow:0 6px 20px rgba(155,127,212,0.3);transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px;}
-        .btn-register:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(155,127,212,0.44);}
+        .nav-link {
+            display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+            border-radius: 16px; color: var(--text-dim); font-weight: 600;
+            font-size: 0.88rem; text-decoration: none; transition: all 0.3s; margin-bottom: 5px;
+        }
+        .nav-link i { width: 20px; text-align: center; font-size: 1rem; }
+        .nav-link:hover { color: white; background: rgba(255, 255, 255, 0.05); transform: translateX(5px); }
+        .nav-link.active {
+            color: white; background: rgba(168, 85, 247, 0.15);
+            border-left: 4px solid var(--accent-main); border-radius: 4px 16px 16px 4px;
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.1);
+        }
 
-        .chart-panel-body{padding:24px;}
-        .stat-row{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:rgba(248,246,255,0.7);border:1px solid rgba(180,160,220,0.18);border-radius:12px;margin-bottom:10px;transition:all 0.2s;}
-        .stat-row:hover{background:white;box-shadow:0 4px 14px rgba(155,127,212,0.1);}
-        .stat-row-label{font-size:0.75rem;color:var(--tm);font-weight:600;}
-        .stat-row-value{font-family:'Nunito',sans-serif;font-size:1rem;font-weight:900;color:var(--ap);}
+        /* --- MAIN CONTENT --- */
+        .main { flex: 1; padding: 50px; overflow-y: auto; position: relative; z-index: 10; }
+        .main::-webkit-scrollbar { width: 6px; }
+        .main::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
 
-        .platform-icons{display:flex;gap:16px;padding:14px 0;}
-        .platform-icons i{font-size:1.4rem;color:var(--tl);transition:all 0.2s;cursor:pointer;}
-        .platform-icons i:hover{transform:scale(1.15);}
-        .platform-icons .fa-spotify:hover{color:#1db954;}
-        .platform-icons .fa-apple:hover{color:#555;}
-        .platform-icons .fa-youtube:hover{color:#e74c3c;}
-        .platform-icons .fa-amazon:hover{color:#f59e0b;}
-        .platform-icons .fa-soundcloud:hover{color:#ff5500;}
+        .page-header { margin-bottom: 45px; }
+        .page-title { font-family: 'Nunito', sans-serif; font-size: 2.8rem; font-weight: 900; color: white; letter-spacing: -1px; }
+        .page-title span { background: linear-gradient(135deg, var(--accent-main), var(--accent-pink)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .content-grid { display: grid; grid-template-columns: 1fr; gap: 30px; }
+        @media(min-width: 1100px) { .content-grid { grid-template-columns: 1fr 400px; } }
+
+        .panel {
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 36px; backdrop-filter: blur(40px); overflow: hidden;
+            margin-bottom: 25px;
+        }
+        .panel-header {
+            padding: 24px 30px; border-bottom: 1px solid var(--glass-border);
+            display: flex; align-items: center; gap: 15px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .panel-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1rem; color: white; }
+        .panel-title { font-size: 1rem; font-weight: 800; color: white; }
+
+        .form-body { padding: 35px; }
+        .form-label { display: block; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 10px; padding-left: 5px; }
+        .form-input {
+            width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border); border-radius: 16px;
+            font-family: inherit; font-size: 0.95rem; color: white; outline: none; transition: all 0.3s; margin-bottom: 20px;
+        }
+        .form-input:focus { border-color: var(--accent-main); background: rgba(255,255,255,0.06); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+
+        .btn-register {
+            width: 100%; padding: 18px;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-pink));
+            color: white; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900;
+            border: none; border-radius: 18px; cursor: pointer;
+            box-shadow: 0 15px 30px rgba(168, 85, 247, 0.2);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            text-transform: uppercase; letter-spacing: 0.1em;
+        }
+        .btn-register:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(168, 85, 247, 0.4); }
+
+        .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: rgba(255,255,255,0.02); border-radius: 14px; margin-bottom: 12px; }
+        .stat-label { font-size: 0.8rem; color: var(--text-dim); font-weight: 600; }
+        .stat-value { font-family: 'Nunito', sans-serif; font-size: 1.1rem; font-weight: 900; color: var(--accent-cyan); }
+
+        .platform-icons { display: flex; gap: 20px; padding: 10px 0; justify-content: center; }
+        .platform-icons i { font-size: 1.6rem; color: var(--text-dim); transition: all 0.3s; cursor: pointer; }
+        .platform-icons i:hover { transform: scale(1.2); color: white; }
     </style>
 </head>
 <body>
-    <div class="blob b1"></div>
-    <div class="blob b2"></div>
-    <div class="blob b3"></div>
+    <div class="aurora-container">
+        <div class="aurora aurora-1"></div>
+        <div class="aurora aurora-2"></div>
+        <div class="aurora aurora-3"></div>
+    </div>
 
     <aside class="sidebar">
         <div class="logo-row">
             <div class="logo-icon"><i class="fas fa-layer-group"></i></div>
-            <div class="logo-text"><h1>SysAdmin</h1><p>Rule Engine</p></div>
+            <div class="logo-text"><h1>EliteStudio</h1><p>Admin Control</p></div>
         </div>
+        
         <div class="nav-label">Management</div>
         <a th:href="@{/dashboard}" class="nav-link"><i class="fas fa-chart-pie"></i> Dashboard</a>
-        <a th:href="@{/add-artist}" class="nav-link"><i class="fas fa-users-gear"></i> Artists &amp; Payouts</a>
+        <a th:href="@{/add-artist}" class="nav-link"><i class="fas fa-users-gear"></i> Artists & Payouts</a>
         <a th:href="@{/label/track-registration}" class="nav-link active"><i class="fas fa-compact-disc"></i> Track Registry</a>
         <a th:href="@{/admin/events}" class="nav-link"><i class="fas fa-calendar-star"></i> Live Events</a>
         <a th:href="@{/label/analytics}" class="nav-link"><i class="fas fa-chart-line"></i> Analytics</a>
         
         <div class="nav-label">Rule Engine</div>
-        <a th:href="@{/admin/platforms}" class="nav-link"><i class="fas fa-tower-broadcast"></i> Platform Master</a>
+        <a th:href="@{/admin/platforms}" class="nav-link"><i class="fas fa-tower-broadcast"></i> Platforms</a>
         <a th:href="@{/admin/royalty-rules}" class="nav-link"><i class="fas fa-sliders"></i> Royalty Rules</a>
         <a th:href="@{/admin/region-rates}" class="nav-link"><i class="fas fa-globe"></i> Region Rates</a>
         <a th:href="@{/admin/contract-types}" class="nav-link"><i class="fas fa-file-contract"></i> Contract Types</a>
@@ -112,88 +176,68 @@
         <a th:href="@{/admin/audit-logs}" class="nav-link"><i class="fas fa-scroll"></i> Audit Logs</a>
         
         <div style="margin-top:auto">
-            <a th:href="@{/admin/logout}" class="nav-link" style="color:var(--ar)"><i class="fas fa-right-from-bracket"></i> Logout</a>
+            <a th:href="@{/admin/logout}" class="nav-link" style="color:var(--accent-red)"><i class="fas fa-right-from-bracket"></i> Logout</a>
         </div>
     </aside>
 
     <main class="main">
         <div class="page-header">
             <h2 class="page-title">Track <span>Registry</span></h2>
-            <p class="page-sub">Register new tracks and manage distribution metadata</p>
         </div>
 
         <div class="content-grid">
-            <!-- FORM PANEL -->
             <div class="panel">
                 <div class="panel-header">
-                    <div class="panel-icon" style="background:var(--pl);color:var(--ap)"><i class="fas fa-compact-disc"></i></div>
+                    <div class="panel-icon" style="background: rgba(168, 85, 247, 0.2);"><i class="fas fa-compact-disc"></i></div>
                     <span class="panel-title">Register New Track</span>
                 </div>
-                <div class="panel-body">
+                <div class="form-body">
                     <form th:action="@{/label/save-track}" th:object="${track}" method="post">
                         <div class="form-row">
                             <div class="form-group">
-                                <label class="form-label">Artist</label>
-                                <div class="input-wrap">
-                                    <i class="fas fa-user input-icon"></i>
-                                    <select th:field="*{artist}" class="form-input" required>
-                                        <option value="" disabled selected>Select artist...</option>
-                                        <option th:each="a : ${artists}" th:value="${a.id}" th:text="${a.name}"></option>
-                                    </select>
-                                </div>
+                                <label class="form-label">Assign Artist</label>
+                                <select th:field="*{artist}" class="form-input" required style="background-color: #130f26;">
+                                    <option value="" disabled selected>Select artist...</option>
+                                    <option th:each="a : ${artists}" th:value="${a.id}" th:text="${a.name}"></option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Track Title</label>
-                                <div class="input-wrap">
-                                    <i class="fas fa-music input-icon"></i>
-                                    <input type="text" th:field="*{title}" class="form-input" placeholder="e.g. Midnight Drive" required>
-                                </div>
+                                <input type="text" th:field="*{title}" class="form-input" placeholder="e.g. Midnight Drive" required>
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label">ISRC Code</label>
-                                <input type="text" class="form-input no-icon" placeholder="US-RC1-23-00001">
+                                <input type="text" class="form-input" placeholder="US-RC1-23-00001">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Release Date</label>
-                                <input type="date" class="form-input no-icon">
+                                <input type="date" class="form-input" style="background-color: #130f26;">
                             </div>
                         </div>
-
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                <h4>Spatial Audio &amp; AI Mastering</h4>
-                                <p>Enable enhanced distribution settings</p>
-                            </div>
-                            <button type="button" class="toggle">
-                                <div class="toggle-thumb"></div>
-                            </button>
-                        </div>
-
                         <button type="submit" class="btn-register">
-                            <i class="fas fa-upload"></i> Register Track
+                            <i class="fas fa-upload"></i> REGISTER TRACK
                         </button>
                     </form>
                 </div>
             </div>
 
-            <!-- SIDEBAR PANEL -->
             <div class="panel">
                 <div class="panel-header">
-                    <div class="panel-icon" style="background:var(--pm);color:var(--at)"><i class="fas fa-chart-line"></i></div>
+                    <div class="panel-icon" style="background: rgba(6, 182, 212, 0.2);"><i class="fas fa-chart-line"></i></div>
                     <span class="panel-title">Market Projection</span>
                 </div>
-                <div class="chart-panel-body">
-                    <div style="height:200px;margin-bottom:20px">
+                <div class="form-body">
+                    <div style="height:220px; margin-bottom:25px">
                         <canvas id="marketChart"></canvas>
                     </div>
                     <div class="stat-row">
-                        <span class="stat-row-label">Est. Stream Range</span>
-                        <span class="stat-row-value">1.2M – 4.8M</span>
+                        <span class="stat-label">Estimated Stream Range</span>
+                        <span class="stat-value">1.4M – 5.2M</span>
                     </div>
-                    <div style="padding:14px 16px;background:rgba(248,246,255,0.7);border:1px solid rgba(180,160,220,0.18);border-radius:12px">
-                        <div class="stat-row-label" style="margin-bottom:10px">Platform Compatibility</div>
+                    <div style="margin-top:25px; text-align:center;">
+                        <span class="form-label" style="margin-bottom:15px">Platform Compatibility</span>
                         <div class="platform-icons">
                             <i class="fab fa-spotify"></i>
                             <i class="fab fa-apple"></i>
@@ -213,20 +257,21 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Week 1','Week 2','Week 3','Week 4','Week 5'],
+                    labels: ['W1','W2','W3','W4','W5'],
                     datasets: [{
-                        data: [10, 35, 25, 65, 90],
-                        borderColor: '#9b7fd4',
-                        borderWidth: 2.5,
-                        pointBackgroundColor: '#4daa90',
-                        pointBorderColor: '#4daa90',
-                        pointRadius: 4,
+                        data: [12, 40, 28, 70, 95],
+                        borderColor: '#a855f7',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#06b6d4',
+                        pointBorderColor: 'white',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
                         tension: 0.4,
                         fill: true,
                         backgroundColor: (ctx) => {
                             const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
-                            g.addColorStop(0, 'rgba(155,127,212,0.25)');
-                            g.addColorStop(1, 'rgba(155,127,212,0)');
+                            g.addColorStop(0, 'rgba(168, 85, 247, 0.3)');
+                            g.addColorStop(1, 'rgba(168, 85, 247, 0)');
                             return g;
                         }
                     }]
@@ -235,7 +280,7 @@
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#a09bbf', font: { size: 10, weight: 'bold', family: 'Nunito' } } },
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } },
                         y: { display: false, min: 0 }
                     }
                 }
@@ -244,3 +289,4 @@
     </script>
 </body>
 </html>
+l>

@@ -3,6 +3,7 @@
 <head>
     <title>Artist Dashboard | EliteStudio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Nunito:wght@900&display=swap" rel="stylesheet">
     <style>
@@ -26,7 +27,7 @@
             background-color: var(--bg-deep);
             font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-ghost);
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             overflow: hidden;
         }
@@ -36,7 +37,7 @@
             position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
         }
         .aurora {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.25;
+            position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.25;
             animation: auroraMove 25s infinite alternate;
         }
         .aurora-1 { width: 80vw; height: 80vh; background: var(--aurora-1); top: -20%; left: -20%; }
@@ -56,7 +57,7 @@
             border-right: 1px solid var(--glass-border);
             padding: 40px 20px; display: flex; flex-direction: column;
             position: relative; z-index: 50;
-        }
+         overflow-y: auto;}
 
         .logo-row { display: flex; align-items: center; gap: 15px; margin-bottom: 45px; padding: 0 10px; }
         .logo-icon {
@@ -123,9 +124,12 @@
             background: var(--glass-bg); border: 1px solid var(--glass-border);
             border-radius: 30px; padding: 30px; backdrop-filter: blur(30px);
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: default;
         }
-        .stat-card:hover { transform: translateY(-10px); border-color: rgba(255,255,255,0.2); box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
-        .stat-icon { font-size: 1.5rem; margin-bottom: 15px; }
+        .stat-card:hover { transform: translateY(-10px) scale(1.02); border-color: rgba(255,255,255,0.2); box-shadow: 0 30px 60px rgba(0,0,0,0.3); }
+        .stat-icon { font-size: 1.5rem; margin-bottom: 15px; transition: transform 0.3s; }
+        .stat-card:hover .stat-icon { transform: scale(1.2) rotate(10deg); }
+        
         .stat-label { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); margin-bottom: 8px; }
         .stat-value { font-family: 'Nunito', sans-serif; font-size: 2.2rem; font-weight: 900; color: white; letter-spacing: -1px; }
 
@@ -133,8 +137,10 @@
         .panel {
             background: var(--glass-bg); border: 1px solid var(--glass-border);
             border-radius: 36px; backdrop-filter: blur(30px); overflow: hidden;
-            margin-bottom: 30px;
+            margin-bottom: 30px; transition: all 0.3s;
         }
+        .panel:hover { border-color: rgba(255,255,255,0.15); }
+        
         .panel-header {
             padding: 24px 30px; border-bottom: 1px solid var(--glass-border);
             display: flex; align-items: center; justify-content: space-between;
@@ -144,6 +150,7 @@
         .panel-badge { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 14px; border-radius: 20px; }
         .badge-purple { background: rgba(168, 85, 247, 0.15); color: var(--accent-main); }
         .badge-cyan { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+        .badge-gold { background: rgba(251, 191, 36, 0.15); color: #fbbf24; }
 
         table { width: 100%; border-collapse: collapse; }
         th { padding: 18px 30px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.15em; color: var(--text-dim); text-align: left; border-bottom: 1px solid var(--glass-border); }
@@ -170,7 +177,18 @@
         textarea.form-input { resize:none; height:120px; }
         .btn-submit { width: 100%; padding: 18px; background: linear-gradient(135deg, var(--accent-main), var(--accent-pink)); color: white; font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900; border: none; border-radius: 18px; cursor: pointer; box-shadow: 0 15px 30px rgba(168, 85, 247, 0.3); transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
         .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 25px 50px rgba(168, 85, 247, 0.5); }
-    </style>
+    
+        .scroll-v { max-height: 450px; overflow-y: auto; }
+        .scroll-v::-webkit-scrollbar { width: 5px; }
+        .scroll-v::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+
+        .career-insight {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(6, 182, 212, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 24px; padding: 25px;
+            display: flex; gap: 20px; align-items: flex-start;
+        }
+        .insight-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--accent-main); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem; flex-shrink: 0; box-shadow: 0 10px 20px rgba(168, 85, 247, 0.2); }
+</style>
 </head>
 <body>
     <div class="aurora-container">
@@ -182,7 +200,7 @@
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="logo-row">
-            <div class="logo-icon"><i class="fas fa-music"></i></div>
+            <div class="logo-icon"><i class="fas fa-play"></i></div>
             <div class="logo-text">
                 <h1>EliteStudio</h1>
                 <p>Artist Hub</p>
@@ -190,7 +208,7 @@
         </div>
         
         <div class="nav-label">Studio</div>
-        <a href="#" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a th:href="@{/artist/dashboard}" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
         <a th:href="@{/artist/payments}" class="nav-link"><i class="fas fa-coins"></i> Royalties</a>
         <a th:href="@{/artist/profile}" class="nav-link"><i class="fas fa-id-card"></i> My Profile</a>
         
@@ -204,96 +222,182 @@
 
     <!-- MAIN CONTENT -->
     <main class="main">
-        <div class="page-header">
+        <div class="page-header" style="display:flex; justify-content:space-between; align-items:flex-end;">
             <div>
-                <div class="live-chip"><span class="live-dot"></span> LIVE SESSION</div>
+                <div class="live-chip"><span class="live-dot"></span> ANALYTICS LIVE</div>
                 <h2 class="artist-name" th:text="${artist.name}">Artist Name</h2>
-                <p class="header-sub"><i class="fas fa-shield-check" style="color:var(--accent-cyan);margin-right:8px"></i>Contract Active &bull; Secure Streaming Protocol Enforced</p>
+                <p class="header-sub"><i class="fas fa-shield-check" style="color:var(--accent-cyan);margin-right:8px"></i>Platinum Distribution Active &bull; Verified Creator</p>
+            </div>
+            <div>
+                <a th:href="@{/artist/download-invoice}" class="btn-submit" style="padding:12px 24px; font-size:0.8rem; margin:0; width:auto; text-decoration:none;"><i class="fas fa-file-pdf"></i> SYNC INVOICE</a>
             </div>
         </div>
 
         <!-- STATS -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon" style="color:var(--accent-main)"><i class="fas fa-compact-disc"></i></div>
-                <div class="stat-label">Streaming Earnings</div>
+                <div class="stat-icon" style="color:var(--accent-main)"><i class="fas fa-waveform-lines"></i></div>
+                <div class="stat-label">Streaming Net</div>
                 <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(myEarnings, 1, 2)}">$0.00</div>
-                <div class="stat-trend" style="color:var(--accent-main)">Based on contract split</div>
+                <div class="stat-trend" style="color:var(--accent-main); font-size:0.7rem; font-weight:800; margin-top:10px;">MARKET PERFORMANCE: OPTIMAL</div>
             </div>
             <div class="stat-card">
                 <div class="stat-icon" style="color:var(--accent-pink)"><i class="fas fa-ticket"></i></div>
-                <div class="stat-label">Tour Ticket Revenue</div>
+                <div class="stat-label">Tour Revenue</div>
                 <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(myEventEarnings != null ? myEventEarnings : 0.0, 1, 2)}">$0.00</div>
-                <div class="stat-trend" style="color:var(--accent-pink)">Direct fan sales</div>
+                <div class="stat-trend" style="color:var(--accent-pink); font-size:0.7rem; font-weight:800; margin-top:10px;">DIRECT FAN ENGAGEMENT</div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon" style="color:var(--accent-cyan)"><i class="fas fa-users-rays"></i></div>
-                <div class="stat-label">Active Audience</div>
+                <div class="stat-icon" style="color:var(--accent-cyan)"><i class="fas fa-heart"></i></div>
+                <div class="stat-label">Active Fan Base</div>
                 <div class="stat-value" th:text="${totalFans}">0</div>
-                <div class="stat-trend" style="color:var(--accent-cyan)">Live global reach</div>
+                <div class="stat-trend" style="color:var(--accent-cyan); font-size:0.7rem; font-weight:800; margin-top:10px;">MOMENTUM GROWING</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(168,85,247,0.1), rgba(236,72,153,0.1)); border-color: rgba(168,85,247,0.3);">
+                <div class="stat-icon" style="color:#fbbf24"><i class="fas fa-award"></i></div>
+                <div class="stat-label">Industry Status</div>
+                <div class="stat-value" style="color:#fbbf24; font-size: 1.8rem;" th:text="${badgeLevel}">Platinum</div>
+                <div class="stat-trend" style="color:white; font-size: 0.7rem; line-height: 1.3; margin-top: 10px;"><i class="fas fa-star" style="color:#fbbf24"></i> High Impact Artist</div>
             </div>
         </div>
 
-        <!-- STREAMING LEDGER -->
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title"><i class="fas fa-waveform" style="color:var(--accent-main)"></i> Streaming Royalty Ledger</div>
-                <span class="panel-badge badge-purple" th:text="${artist.contractSplit + '% Artist Split'}">70% Split</span>
-            </div>
-            <div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Track Name</th>
-                            <th>Platform</th>
-                            <th style="text-align:center">Plays</th>
-                            <th style="text-align:right">Your Net Payout</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="tx : ${myTransactions}">
-                            <td>
-                                <div style="display:flex;align-items:center">
-                                    <div class="track-icon"><i class="fas fa-music"></i></div>
-                                    <span class="track-name" th:text="${tx.songTitle}">Track</span>
-                                </div>
-                            </td>
-                            <td><span class="platform-chip" th:text="${tx.platform}">Platform</span></td>
-                            <td style="text-align:center;font-weight:700;color:var(--text-dim)" th:text="${#numbers.formatInteger(tx.streamCount, 0, 'COMMA')}">0</td>
-                            <td style="text-align:right"><span class="payout" th:text="${'$' + #numbers.formatDecimal(tx.grossRevenue * (artist.contractSplit / 100.0), 1, 2)}">$0.00</span></td>
-                        </tr>
-                        <tr th:if="${myTransactions.empty}"><td colspan="4" style="text-align:center; padding: 50px; color: var(--text-dim);">No royalty data available</td></tr>
-                    </tbody>
-                </table>
+        <!-- STRATEGY INSIGHT -->
+        <div class="panel" style="padding: 10px;">
+            <div class="career-insight">
+                <div class="insight-icon"><i class="fas fa-bolt-lightning"></i></div>
+                <div>
+                    <h4 style="font-size:0.9rem; font-weight:900; color:white; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;">Career Strategy Insight</h4>
+                    <p style="font-size:0.85rem; color:var(--text-ghost); opacity:0.8;" th:text="${smartInsight}">Data-driven recommendation for your next career move.</p>
+                </div>
             </div>
         </div>
 
-        <!-- TICKET SALES FEED -->
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 25px;">
+            <!-- STREAMING LEDGER -->
+            <div class="panel" style="margin-bottom:0">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-compact-disc" style="color:var(--accent-main)"></i> Streaming Ledger</div>
+                    <span class="panel-badge badge-purple" th:text="${artist.contractSplit + '% Split Active'}">70% Split</span>
+                </div>
+                <div class="scroll-v">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Track Title</th>
+                                <th>Platform</th>
+                                <th style="text-align:center">Plays</th>
+                                <th style="text-align:right">Your Net</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="tx : ${myTransactions}">
+                                <td>
+                                    <div style="display:flex;align-items:center">
+                                        <div class="track-icon"><i class="fas fa-music"></i></div>
+                                        <span class="track-name" th:text="${tx.songTitle}">Track</span>
+                                    </div>
+                                </td>
+                                <td><span class="platform-chip" th:text="${tx.platform}">Platform</span></td>
+                                <td style="text-align:center;font-weight:800;color:var(--text-dim)" th:text="${#numbers.formatInteger(tx.streamCount, 0, 'COMMA')}">0</td>
+                                <td style="text-align:right"><span class="payout" th:text="${'$' + #numbers.formatDecimal(tx.grossRevenue * (artist.contractSplit / 100.0), 1, 2)}">$0.00</span></td>
+                            </tr>
+                            <tr th:if="${myTransactions.empty}"><td colspan="4" style="text-align:center; padding: 50px; color: var(--text-dim);">No royalty data available</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PLATFORM CHART -->
+            <div class="panel" style="margin-bottom:0">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-chart-pie" style="color:var(--accent-cyan)"></i> Platform Spread</div>
+                </div>
+                <div style="padding:20px; height: 350px;">
+                    <canvas id="platformChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOP SONGS -->
         <div class="panel">
             <div class="panel-header">
-                <div class="panel-title"><i class="fas fa-ticket-perforated" style="color:var(--accent-pink)"></i> Premium Ticket Analytics</div>
-                <span class="panel-badge badge-cyan">Privacy Protected</span>
+                <div class="panel-title"><i class="fas fa-fire" style="color:#f59e0b"></i> Hot Songs Leaderboard</div>
+                <span class="panel-badge badge-gold">Trending Now</span>
             </div>
-            <div style="max-height:400px; overflow-y:auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Live Event</th>
-                            <th style="text-align:center">Ticket Tier</th>
-                            <th style="text-align:center">Quantity</th>
-                            <th style="text-align:right">Your Share</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr th:each="p : ${myTicketPurchases}">
-                            <td><span style="font-weight:700;color:white" th:text="${p.event.name}">Event</span></td>
-                            <td style="text-align:center"><span class="platform-chip" th:text="${p.ticketType}">Type</span></td>
-                            <td style="text-align:center;font-weight:700;color:var(--text-dim)" th:text="${p.quantity}">0</td>
-                            <td style="text-align:right"><span class="payout-pink" th:text="${'$' + #numbers.formatDecimal(p.totalAmount * (artist.contractSplit / 100.0), 1, 2)}">$0.00</span></td>
-                        </tr>
-                        <tr th:if="${myTicketPurchases.empty}"><td colspan="4" style="text-align:center; padding: 50px; color: var(--text-dim);">No ticket transactions yet</td></tr>
-                    </tbody>
-                </table>
+            <div style="padding: 25px 30px;">
+                <div th:if="${topSongs.empty}" style="text-align:center; padding: 40px; color:var(--text-dim);">
+                    <i class="fas fa-music-slash" style="font-size:2rem; margin-bottom:15px; display:block; opacity:0.5;"></i>
+                    Upload catalog data to activate leaderboards.
+                </div>
+                <div th:each="song, s : ${topSongs}" style="margin-bottom: 25px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <div th:text="${s.index + 1}" style="width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--accent-main),var(--accent-pink));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.8rem;color:white; box-shadow: 0 4px 10px rgba(168,85,247,0.3);">1</div>
+                            <span style="font-weight:700; color:white; font-size:1rem;" th:text="${song['songTitle']}">Song</span>
+                        </div>
+                        <div style="text-align:right">
+                            <span style="font-weight:900; color:var(--accent-cyan); font-size:1.1rem; display:block;" th:text="${'$' + #numbers.formatDecimal(song['revenue'], 1, 2)}">$0.00</span>
+                            <span style="font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; font-weight:800;">Song Revenue</span>
+                        </div>
+                    </div>
+                    <div style="height:8px; background:rgba(255,255,255,0.06); border-radius:10px; overflow:hidden;">
+                        <div th:style="'width:' + ${song['percentage']} + '%; height:100%; border-radius:10px; background: linear-gradient(90deg, var(--accent-main), var(--accent-pink)); box-shadow: 0 0 15px rgba(168,85,247,0.4);'"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+            <!-- PAYOUT REQUEST -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-piggy-bank" style="color:#10b981"></i> Withdraw Earnings</div>
+                    <span class="panel-badge" style="background:rgba(16,185,129,0.15);color:#10b981;">Payout Access</span>
+                </div>
+                <div style="padding: 30px;">
+                    <form th:action="@{/artist/request-payout}" method="post" style="display:flex; flex-direction:column; gap:20px;">
+                        <div>
+                            <label class="form-label">Amount ($)</label>
+                            <input type="number" step="0.01" name="amount" class="form-input" 
+                                   th:max="${totalEarnings}" placeholder="0.00" required
+                                   style="width:100%; padding:14px 18px; background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:16px; color:white; font-family:inherit; outline:none; font-weight:700;">
+                        </div>
+                        <div>
+                            <label class="form-label">Settlement Details</label>
+                            <input type="text" name="bankDetails" class="form-input" placeholder="Bank Title & Account or UPI" required
+                                   style="width:100%; padding:14px 18px; background:rgba(255,255,255,0.03); border:1px solid var(--glass-border); border-radius:16px; color:white; font-family:inherit; outline:none;">
+                        </div>
+                        <button type="submit" class="btn-submit" style="background:linear-gradient(135deg,#10b981,#059669);"><i class="fas fa-paper-plane"></i> INITIATE WITHDRAWAL</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TICKET PURCHASES -->
+            <div class="panel">
+                <div class="panel-header">
+                    <div class="panel-title"><i class="fas fa-ticket" style="color:var(--accent-pink)"></i> Tour Feed</div>
+                    <span class="panel-badge badge-cyan">Live Sales</span>
+                </div>
+                <div class="scroll-v">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th style="text-align:right">Your Share</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="p : ${myTicketPurchases}">
+                                <td>
+                                    <div style="font-weight:700;color:white" th:text="${p.event.name}">Event</div>
+                                    <div style="font-size:0.7rem; color:var(--text-dim); margin-top:3px;" th:text="${p.ticketType + ' Tier'}">Tier</div>
+                                </td>
+                                <td style="text-align:right"><span class="payout-pink" th:text="${'$' + #numbers.formatDecimal(p.totalAmount * (artist.contractSplit / 100.0), 1, 2)}">$0.00</span></td>
+                            </tr>
+                            <tr th:if="${myTicketPurchases.empty}"><td colspan="2" style="text-align:center; padding: 50px; color: var(--text-dim);">No ticket transactions yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </main>
@@ -305,17 +409,49 @@
             <h3 class="modal-title">File a Dispute</h3>
             <p class="modal-sub">Report a payment or royalty discrepancy</p>
             <form th:action="@{/artist/raise-dispute}" method="post">
-                <label class="form-label">Impacted Work (Track/Event)</label>
-                <input type="text" name="trackName" class="form-input" placeholder="e.g. Midnight Melodies (Live)" required>
-                <label class="form-label">Discrepancy Details</label>
-                <textarea name="reason" class="form-input" placeholder="Please describe the issue in detail..." required></textarea>
-                <button type="submit" class="btn-submit"><i class="fas fa-paper-plane"></i> SUBMIT DISPUTE</button>
+                <label class="form-label">Impacted Work</label>
+                <input type="text" name="trackName" class="form-input" placeholder="e.g. Midnight Drive" required>
+                <label class="form-label">Dispute Details</label>
+                <textarea name="reason" class="form-input" placeholder="Describe the discrepancy in detail..." required></textarea>
+                <button type="submit" class="btn-submit"><i class="fas fa-flag"></i> SUBMIT DISPUTE</button>
             </form>
         </div>
     </div>
-    <script>
+
+    <script th:inline="javascript">
         function openModal(){document.getElementById('disModal').style.display='flex';}
         function closeModal(){document.getElementById('disModal').style.display='none';}
+
+        /*<![CDATA[*/
+        var platformData = /*[[${platformEarnings}]]*/ {};
+        
+        if (platformData && Object.keys(platformData).length > 0) {
+            var ctx = document.getElementById('platformChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(platformData),
+                    datasets: [{
+                        data: Object.values(platformData),
+                        backgroundColor: ['#a855f7', '#06b6d4', '#ec4899', '#fbbf24', '#3b82f6'],
+                        borderWidth: 0,
+                        hoverOffset: 12
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 10, weight: 'bold' }, padding: 20 }
+                        }
+                    },
+                    cutout: '80%'
+                }
+            });
+        }
+        /*]]>*/
     </script>
 </body>
 </html>
